@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "Hello from the chained /sbin/init" 1>&2

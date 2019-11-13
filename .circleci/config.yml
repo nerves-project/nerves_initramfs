@@ -1,0 +1,38 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: nervesproject/nerves_system_br:1.9.4
+
+jobs:
+  build_initramfs_images:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: "Build initramfs images"
+          command: |
+            cd builder && ./build-all.sh
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: "Build and test"
+          command: |
+            make
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - build_initramfs_images:
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          filters:
+            tags:
+              only: /.*/

@@ -1,0 +1,43 @@
+rootfs.path = "/dev/mmcblk0p2"
+rootfs.fstype = "squashfs"
+rootfs.cipher = "aes-cbc-plain"
+rootfs.secret = "8e9c0780fd7f5d00c18a30812fe960cfce71f6074dd9cded6aab2897568cc856"
+rootfs.encrypted = true
+run_repl = true
+
+
+f=false
+x=5
+
+a.b = true
+
+y= "dd"
+
+uboot.var = "set a uboot environment variable"
+info(x)
+my_function()
+my_function(y)
+my_function(a.b,x)
+my_function(1,2,3,4)
+
+rootfs.fstype = "squashfs"
+rootfs.cipher = "aes-cbc-plain"
+rootfs.secret = "abc123"
+
+uboot.validated == "true" -> {
+    rootfs.path="/dev/mmcblk0p1";
+    boot();
+    }
+
+uboot.validated == "false" && uboot.tried == "false" -> { uboot.tried = "true"; boot(); }
+
+uboot.validated == "false" && uboot.tried == "true" -> { uboot.active = "a"; uboot.validated = "true"; boot(); }
+
+(x == 4 || y == 3) && uboot.var == "asdf" -> boot();
+
+x = x + 1
+info(x)
+
+info("Nothing matched!")
+
+

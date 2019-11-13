@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#
+# Test that no options does the expected
+#
+
+cat >$CMDLINE_FILE <<EOF
+EOF
+
+cat >$EXPECTED <<EOF
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mkdir("/mnt", 777)
+fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
+fixture: unlink("/init")
+fixture: rmdir("/root")
+fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
+fixture: mount(".", "/", "(null)", 8192, data)
+fixture: chroot(.)
+Hello from the chained /sbin/init
+EOF
+

@@ -1,0 +1,7 @@
+config BR2_PACKAGE_ROOTFS_MOUNTER
+	bool "rootfs_mounter"
+	depends on BR2_INIT_NONE
+	help
+	  Simple rootfs mounter.
+
+	  https://github.com/fhunleth/rootfs_mounter
