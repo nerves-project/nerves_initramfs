@@ -48,8 +48,8 @@ The configuration file supports variable assignments and calls to functions.
 
 The following variables have special meanings:
 
- Variable          | Description
--------------------+-------------
+Variable           | Description
+-------------------|-------------
 rootfs.fstype      | Root filesystem time. Defaults to "squashfs"
 rootfs.path        | Root filesystem path. Defaults to "/dev/mmcblk0p2"
 rootfs.encrypted   | True if the filesystem is encrypted. Defaults to `false`
@@ -64,8 +64,8 @@ run_repl           | True to run a REPL before booting. This is useful for debug
 
 Some functions are supported:
 
- Function          | Description
--------------------+-------------
+Function           | Description
+-------------------|-------------
 info(...)          | Prints any arguments passed to it
 help()             | Print out help when running in the REPL
 vars()             | Print out all known variables and their values
