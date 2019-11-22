@@ -64,19 +64,19 @@ Assignment:
 BooleanExpression:
   term                                    { $$ = term_to_boolean($1); }
   | '(' BooleanExpression ')'               { $$ = $2; }
-  | Comparison                              { $$ = $1; }
+  | Comparison
   | NOT BooleanExpression                   { $$ = !$2; }
   | BooleanExpression AND BooleanExpression { $$ = $1 && $3; }
   | BooleanExpression OR BooleanExpression  { $$ = $1 || $3; }
   ;
 
 Comparison:
-  term NEQ term               { $$ = 1; }
-  | term LT term              { $$ = 1; }
-  | term LTE term             { $$ = 1; }
-  | term EQ term              { $$ = 1; }
-  | term GTE term             { $$ = 1; }
-  | term GT term              { $$ = 1; }
+  term NEQ term               { $$ = term_to_boolean($1) != term_to_boolean($3); }
+  | term LT term              { $$ = term_to_boolean($1) <  term_to_boolean($3); }
+  | term LTE term             { $$ = term_to_boolean($1) <= term_to_boolean($3); }
+  | term EQ term              { $$ = term_to_boolean($1) == term_to_boolean($3); }
+  | term GTE term             { $$ = term_to_boolean($1) >= term_to_boolean($3); }
+  | term GT term              { $$ = term_to_boolean($1) >  term_to_boolean($3); }
   ;
 
 FunctionCall:
