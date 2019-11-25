@@ -170,36 +170,36 @@ void inspect(const struct term *rv)
 {
     switch (rv->kind) {
     case term_identifier:
-        printf("%s", rv->identifier);
+        fprintf(stderr, "%s", rv->identifier);
         break;
     case term_string:
-        printf("\"%s\"", rv->string);
+        fprintf(stderr, "\"%s\"", rv->string);
         break;
     case term_number:
-        printf("%d", rv->number);
+        fprintf(stderr, "%d", rv->number);
         break;
     case term_boolean:
-        printf("%s", rv->boolean ? "true" : "false");
+        fprintf(stderr, "%s", rv->boolean ? "true" : "false");
         break;
     case term_fun: {
         const struct term *p = rv->fun.parameters;
         const struct function_info *fun_info = function_info_by_fun(rv->fun.fun);
-        printf("%s(", fun_info->name);
+        fprintf(stderr, "%s(", fun_info->name);
         for (int i = 0; i < fun_info->arity; i++) {
             inspect(p);
             p = p->next;
             if (p)
-                printf(",");
+                fprintf(stderr, ",");
         }
-        printf(")");
+        fprintf(stderr, ")");
         break;
     }
     case term_variable:
-        printf("%s=", rv->var.name);
+        fprintf(stderr, "%s=", rv->var.name);
         inspect(rv->var.value);
         break;
     default:
-        printf("Unknown");
+        fprintf(stderr, "Unknown");
         break;
     }
 }
@@ -389,7 +389,7 @@ static const struct term *function_info(const struct term *parameters)
 {
     while (parameters) {
         const struct term *str = term_to_string(parameters);
-        printf("%s\n", str->string);
+        fprintf(stderr, "%s\n", str->string);
         parameters = parameters->next;
     }
     return NULL;
@@ -401,7 +401,7 @@ static const struct term *function_vars(const struct term *parameters)
 
     for (const struct term *var = variables; var; var = var->next) {
         inspect(var);
-        printf("\n");
+        fprintf(stderr, "\n");
     }
     return NULL;
 }
@@ -411,7 +411,7 @@ static const struct term *function_env(const struct term *parameters)
     (void)parameters;
 
     for (const struct uboot_name_value *var = working_uboot_env.vars; var; var = var->next) {
-        printf("%s=%s", var->name, var->value);
+        fprintf(stderr, "%s=%s", var->name, var->value);
     }
 
     return NULL;
@@ -565,7 +565,7 @@ const struct term *function_help(const struct term *parameters)
 
     struct function_info *entry = function_table;
     while (entry->handler) {
-        printf("%s/%d\n", entry->name, entry->arity);
+        fprintf(stderr, "%s/%d\n", entry->name, entry->arity);
         entry++;
     }
     return NULL;
@@ -594,6 +594,6 @@ int eval_file(const char *path)
 
 int yyerror(char const *msg)
 {
-  printf("Error on line %d: %s\n", yyget_lineno(), msg);
+  fprintf(stderr, "Error on line %d: %s\n", yyget_lineno(), msg);
   return 0;
 }
