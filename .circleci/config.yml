@@ -5,30 +5,108 @@ defaults: &defaults
   docker:
     - image: nervesproject/nerves_system_br:1.9.4
 
+install_ghr: &install_ghr
+  run:
+    name: Install ghr (Github Releases)
+    command: |
+      wget https://github.com/tcnksm/ghr/releases/download/v0.9.0/ghr_v0.9.0_linux_amd64.tar.gz
+      tar xf ghr_v0.9.0_linux_amd64.tar.gz
+      ln -sf ghr_v0.9.0_linux_amd64/ghr .
+
+build_initramfs: &build_initramfs
+  steps:
+    - checkout
+    - run:
+        name: Create artifacts dir
+        command: |
+          mkdir -p ~/deploy/artifacts
+          cp CHANGELOG.md ~/deploy/CHANGELOG.md
+    - run:
+        name: Build initramfs images
+        command: |
+          cd builder && ./create-build.sh configs/${TARGET_CONFIG}_defconfig
+          make -C o/$TARGET_CONFIG
+    - run:
+        name: Copy initramfs images
+        command: |
+          cp builder/o/$TARGET_CONFIG/images/rootfs.cpio.gz ~/deploy/artifacts/initramfs-$TARGET_CONFIG.gz
+          cd ~/deploy/artifacts && sha256sum initramfs-$TARGET_CONFIG.gz > initramfs-$TARGET_CONFIG.sha256
+    - store_artifacts:
+        path: ~/deploy
+        destination: images
+    - run:
+        name: Pass target to save_cache
+        command: echo "$TARGET_CONFIG" > .target
+    - save_cache:
+        key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
+        paths:
+          - ~/deploy
+
+run_tests: &run_tests
+  steps:
+    - checkout
+    - run:
+        name: Run tests
+        command: |
+          make -C src
+          make -C tests/fixture
+          cd tests && ./run_tests.sh
+
 jobs:
-  build_initramfs_images:
+  build_armel:
     <<: *defaults
-    steps:
-      - checkout
-      - run:
-          name: "Build initramfs images"
-          command: |
-            cd builder && ./build-all.sh
+    environment:
+        TARGET_CONFIG: nerves_initramfs_armel
+    <<: *build_initramfs
+
+  build_x86_64:
+    <<: *defaults
+    environment:
+        TARGET_CONFIG: nerves_initramfs_x86_64
+    <<: *build_initramfs
 
   test:
     <<: *defaults
+    <<: *run_tests
+
+  deploy:
+    <<: *defaults
     steps:
       - checkout
+      - <<: *install_ghr
       - run:
-          name: "Build and test"
-          command: |
-            make
+          name: Create deploy directory
+          command: mkdir -p ~/deploy
+      - run:
+          name: Restore nerves_initramfs_armel
+          command: echo "nerves_initramfs_armel" > .target
+      - restore_cache:
+          key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
+      - run:
+          name: Restore nerves_initramfs_x86_64
+          command: echo "nerves_initramfs_x86_64" > .target
+      - restore_cache:
+          key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
+      - run:
+          name: Create release notes
+          command: grep -Pazo "(?s)(?<=## ${CIRCLE_TAG})[^#]+" ~/deploy/CHANGELOG.md | sed '/./,$!d' > ~/deploy/RELEASE_NOTES
+      - store_artifacts:
+          path: ~/deploy
+          destination: images
+      - run:
+          name: Deploy artifacts to Github
+          command: ./ghr -draft -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -b "$(cat ~/deploy/RELEASE_NOTES)" -replace $CIRCLE_TAG ~/deploy/artifacts
+
 
 workflows:
   version: 2
-  build_test_deploy:
+  build_deploy:
     jobs:
-      - build_initramfs_images:
+      - build_armel:
+          filters:
+            tags:
+              only: /.*/
+      - build_x86_64:
           filters:
             tags:
               only: /.*/
@@ -36,3 +114,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - deploy:
+          requires:
+            - build_armel
+            - build_x86_64
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.*/

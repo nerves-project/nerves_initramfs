@@ -1,5 +1,7 @@
 # nerves_initramfs
 
+[![CircleCI](https://circleci.com/gh/fhunleth/rootfs_mounter.svg?style=svg)](https://circleci.com/gh/fhunleth/rootfs_mounter)
+
 This project creates a tiny
 [initramfs](https://en.wikipedia.org/wiki/Initial_ramdisk) that supports
 cross-platform failure recovery and non-trivial root filesystem setups on
