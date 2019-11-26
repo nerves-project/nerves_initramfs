@@ -202,7 +202,7 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 static void repl()
 {
     char *line;
-    while((line = linenoise("boot> ")) != NULL) {
+    while((line = linenoise("nerves_initramfs> ")) != NULL) {
         linenoiseHistoryAdd(line);
         eval_string(line); // eval_string owns memory and calls free.
     }
