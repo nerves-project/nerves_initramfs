@@ -26,6 +26,9 @@ extern int yyerror(const char *s);
 %type <boolean> BooleanExpression Comparison
 %type <term> term Parameters FunctionCall Action Actions ActionBlock Assignment
 
+%left '-' '+'
+%nonassoc UMINUS
+
 %%
 
 Statements:
@@ -98,6 +101,8 @@ Parameters:
 term:
   term '+' term { $1->next = $3; $$ = term_new_fun("+", $1); }
   | term '-' term { $1->next = $3; $$ = term_new_fun("-", $1); }
+  | '-' term %prec UMINUS { $$ = term_new_number(-term_to_number($2)); }
+  | '(' term ')' { $$ = $2; }
   | IDENTIFIER
   | STRING
   | NUMBER
