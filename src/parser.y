@@ -71,12 +71,12 @@ BooleanExpression:
   ;
 
 Comparison:
-  term NEQ term               { $$ = term_to_boolean($1) != term_to_boolean($3); }
-  | term LT term              { $$ = term_to_boolean($1) <  term_to_boolean($3); }
-  | term LTE term             { $$ = term_to_boolean($1) <= term_to_boolean($3); }
-  | term EQ term              { $$ = term_to_boolean($1) == term_to_boolean($3); }
-  | term GTE term             { $$ = term_to_boolean($1) >= term_to_boolean($3); }
-  | term GT term              { $$ = term_to_boolean($1) >  term_to_boolean($3); }
+  term NEQ term               { $$ = (term_compare($1, $3) != 0); }
+  | term LT term              { $$ = (term_compare($1, $3) < 0); }
+  | term LTE term             { $$ = (term_compare($1, $3) <= 0); }
+  | term EQ term              { $$ = (term_compare($1, $3) == 0); }
+  | term GTE term             { $$ = (term_compare($1, $3) >= 0); }
+  | term GT term              { $$ = (term_compare($1, $3) > 0); }
   ;
 
 FunctionCall:

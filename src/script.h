@@ -62,6 +62,7 @@ struct term *term_dupe(const struct term *rv);
 
 struct term *term_reverse(struct term *rv);
 
+int term_compare(const struct term *left, const struct term *right);
 bool term_to_boolean(const struct term *rv);
 int term_to_number(const struct term *rv);
 const struct term *term_to_string(const struct term *rv);

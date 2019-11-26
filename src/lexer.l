@@ -106,7 +106,7 @@ string          \"[^\"\n]*\"
 "<="            return LTE;
 ">="            return GTE;
 ">"             return GT;
-"<"             return GT;
+"<"             return LT;
 "!"             return NOT;
 "="             return '=';
 "->"            return ARROW;

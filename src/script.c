@@ -234,6 +234,36 @@ const struct term *term_resolve(const struct term *rv)
     }
 }
 
+/**
+ * Compare two terms
+ *
+ * Returns:
+ *   <0 if left < right
+ *   0 if left == right
+ *   >0 if left > right
+ */
+int term_compare(const struct term *left, const struct term *right)
+{
+    const struct term *rleft = term_resolve(left);
+    const struct term *rright = term_resolve(right);
+
+    // Make them the same...
+
+
+    // Left and right are the same now.
+    switch (rleft->kind) {
+    case term_string:
+        return strcmp(rleft->string, rright->string);
+    case term_number:
+        return rleft->number - rright->number;
+    case term_boolean:
+        // true > false
+        return rleft->boolean - rright->boolean;
+    default:
+        return 1; // never happens
+    }
+}
+
 bool term_to_boolean(const struct term *rv)
 {
     rv = term_resolve(rv);
