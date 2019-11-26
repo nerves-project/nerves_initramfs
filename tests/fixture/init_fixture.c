@@ -19,6 +19,7 @@
 #include <linux/loop.h>
 #include <net/if.h>
 #include <glob.h>
+#include <termios.h>
 
 #define log(MSG, ...) do { fprintf(stderr, "fixture: " MSG "\n", ## __VA_ARGS__); } while (0)
 
@@ -435,11 +436,22 @@ static int handle_dm_ioctl(unsigned long request, const struct dm_ioctl *dm)
     return 0;
 }
 
-REPLACE(int, ioctl, (int fd, unsigned long request, ...))
+OVERRIDE(int, ioctl, (int fd, unsigned long request, ...))
 {
     (void) fd;
     const char *req;
     switch (request) {
+    case TIOCGWINSZ:
+    {
+        // This is called by linenoise.
+        va_list ap;
+        va_start(ap, request);
+        struct winsize *ws = va_arg(ap, struct winsize *);
+
+        int rc = ORIGINAL(ioctl)(fd, request, ws);
+        va_end(ap);
+        return rc;
+    }
     case SIOCGIFFLAGS:
         req = "SIOCGIFFLAGS";
         break;
