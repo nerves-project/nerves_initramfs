@@ -1,0 +1,7 @@
+config BR2_PACKAGE_NERVES_INITRAMFS
+	bool "nerves_initramfs"
+	depends on BR2_INIT_NONE
+	help
+	  An initramfs project for Nerves.
+
+	  https://github.com/fhunleth/nerves_initramfs

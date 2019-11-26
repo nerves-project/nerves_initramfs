@@ -1,6 +1,6 @@
 # nerves_initramfs
 
-[![CircleCI](https://circleci.com/gh/fhunleth/rootfs_mounter.svg?style=svg)](https://circleci.com/gh/fhunleth/rootfs_mounter)
+[![CircleCI](https://circleci.com/gh/fhunleth/nerves_initramfs.svg?style=svg)](https://circleci.com/gh/fhunleth/nerves_initramfs)
 
 This project creates a tiny
 [initramfs](https://en.wikipedia.org/wiki/Initial_ramdisk) that supports
@@ -177,4 +177,3 @@ This is illustrative, but obviously quite insecure. The current route to
 obtaining the secret key is to edit the C code to this project to integrate it
 with platform-specific way of keeping or hiding secrets. It is hoped that
 alternatives can be shared in the future.
-

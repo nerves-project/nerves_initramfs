@@ -6,7 +6,7 @@ CFLAGS += -Wall -Wextra
 # _GNU_SOURCE is for asprintf
 CFLAGS += -D_GNU_SOURCE
 
-OBJS = rootfs_mounter.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o
+OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o
 
 ifeq ($(shell uname),Darwin)
 CFLAGS += -Icompat

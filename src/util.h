@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 Frank Hunleth
+ * Copyright 2019 Frank Hunleth
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 #include "uboot_env.h"
 
-#define PROGRAM_NAME "rootfs_mounter"
+#define PROGRAM_NAME "nerves_initramfs"
 
 //#define DEBUG 1
 
