@@ -52,10 +52,10 @@ run_tests: &run_tests
           cd tests && ./run_tests.sh
 
 jobs:
-  build_armel:
+  build_arm:
     <<: *defaults
     environment:
-        TARGET_CONFIG: nerves_initramfs_armel
+        TARGET_CONFIG: nerves_initramfs_arm
     <<: *build_initramfs
 
   build_x86_64:
@@ -77,8 +77,8 @@ jobs:
           name: Create deploy directory
           command: mkdir -p ~/deploy
       - run:
-          name: Restore nerves_initramfs_armel
-          command: echo "nerves_initramfs_armel" > .target
+          name: Restore nerves_initramfs_arm
+          command: echo "nerves_initramfs_arm" > .target
       - restore_cache:
           key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
       - run:
@@ -109,7 +109,7 @@ workflows:
   version: 2
   build_deploy:
     jobs:
-      - build_armel:
+      - build_arm:
           filters:
             tags:
               only: /.*/
@@ -123,7 +123,7 @@ workflows:
               only: /.*/
       - deploy:
           requires:
-            - build_armel
+            - build_arm
             - build_x86_64
             - test
           filters:
