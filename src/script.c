@@ -360,7 +360,6 @@ void set_number_variable(const char *name, int value)
     set_variable(name, term_new_number(value));
 }
 
-
 static const struct term *function_assign(const struct term *parameters)
 {
     const struct term *var = parameters;
@@ -389,9 +388,10 @@ static const struct term *function_info(const struct term *parameters)
 {
     while (parameters) {
         const struct term *str = term_to_string(parameters);
-        fprintf(stderr, "%s\n", str->string);
+        fprintf(stderr, "%s ", str->string);
         parameters = parameters->next;
     }
+    fprintf(stderr, "\n");
     return NULL;
 }
 
