@@ -555,18 +555,18 @@ static const struct term *function_help(const struct term *parameters);
 
 // Function lookup table
 static struct function_info function_table[] = {
-    {"=", 2, function_assign},
-    {"+", 2, function_add},
-    {"-", 2, function_subtract},
-    {"info", 0, function_info},
-    {"help", 0, function_help},
-    {"vars", 0, function_vars},
-    {"env", 0, function_env},
-    {"loadenv", 0, function_loadenv},
-    {"setenv", 2, function_setenv},
-    {"getenv", 1, function_getenv},
-    {"saveenv", 0, function_saveenv},
-    {NULL, 0, NULL}
+    {"=", 2, function_assign, "assign a value to a variable"},
+    {"+", 2, function_add, "add two numbers"},
+    {"-", 2, function_subtract, "substract two numbers"},
+    {"info", 0, function_info, "print any arguments to it"},
+    {"help", 0, function_help, "print out help in the REPL"},
+    {"vars", 0, function_vars, "print all known variables and their values"},
+    {"env", 0, function_env, "print all loaded U-Boot variables"},
+    {"loadenv", 0, function_loadenv, "load a U-Boot environment block"},
+    {"setenv", 2, function_setenv, "set a U-Boot variable. It is not saved until you call saveenv/0"},
+    {"getenv", 1, function_getenv, "get the value of a U-Boot variable"},
+    {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
+    {NULL, 0, NULL, "null"}
 };
 
 fun_handler lookup_function(const char *name, int arity)
@@ -595,7 +595,10 @@ const struct term *function_help(const struct term *parameters)
 
     struct function_info *entry = function_table;
     while (entry->handler) {
-        fprintf(stderr, "%s/%d\n", entry->name, entry->arity);
+        int name_arity_max_size = 12;
+        char name_arity_buff[name_arity_max_size];
+        snprintf(name_arity_buff, name_arity_max_size, "%s/%d", entry->name, entry->arity);
+        fprintf(stderr, "%-16s%s\n", name_arity_buff, entry->description);
         entry++;
     }
     return NULL;

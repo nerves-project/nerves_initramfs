@@ -44,6 +44,7 @@ struct function_info
     const char *name;
     int arity;
     fun_handler handler;
+    const char *description;
 };
 
 fun_handler lookup_function(const char *name, int arity);
