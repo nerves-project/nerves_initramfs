@@ -555,9 +555,9 @@ static const struct term *function_help(const struct term *parameters);
 
 // Function lookup table
 static struct function_info function_table[] = {
-    {"=", 2, function_assign, "assign a value to a variable"},
-    {"+", 2, function_add, "add two numbers"},
-    {"-", 2, function_subtract, "substract two numbers"},
+    {"=", 2, function_assign, NULL},
+    {"+", 2, function_add, NULL},
+    {"-", 2, function_subtract, NULL},
     {"info", 0, function_info, "print any arguments to it"},
     {"help", 0, function_help, "print out help in the REPL"},
     {"vars", 0, function_vars, "print all known variables and their values"},
@@ -566,7 +566,7 @@ static struct function_info function_table[] = {
     {"setenv", 2, function_setenv, "set a U-Boot variable. It is not saved until you call saveenv/0"},
     {"getenv", 1, function_getenv, "get the value of a U-Boot variable"},
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
-    {NULL, 0, NULL, "null"}
+    {NULL, 0, NULL, NULL}
 };
 
 fun_handler lookup_function(const char *name, int arity)
@@ -595,12 +595,15 @@ const struct term *function_help(const struct term *parameters)
 
     struct function_info *entry = function_table;
     while (entry->handler) {
-        int name_arity_max_size = 12;
-        char name_arity_buff[name_arity_max_size];
-        snprintf(name_arity_buff, name_arity_max_size, "%s/%d", entry->name, entry->arity);
-        fprintf(stderr, "%-16s%s\n", name_arity_buff, entry->description);
+        if (entry->description) {
+            char buf[16];
+            snprintf(buf, sizeof(buf), "%s/%d", entry->name, entry->arity);
+            fprintf(stderr, "%-16s%s\n", buf, entry->description);
+        }
         entry++;
     }
+
+    fprintf(stderr, "\nType Ctrl-D to exit repl.\n");
     return NULL;
 }
 
