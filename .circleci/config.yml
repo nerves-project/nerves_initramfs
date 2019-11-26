@@ -29,8 +29,7 @@ build_initramfs: &build_initramfs
     - run:
         name: Copy initramfs images
         command: |
-          cp builder/o/$TARGET_CONFIG/images/rootfs.cpio.gz ~/deploy/artifacts/initramfs-$TARGET_CONFIG.gz
-          cd ~/deploy/artifacts && sha256sum initramfs-$TARGET_CONFIG.gz > initramfs-$TARGET_CONFIG.sha256
+          cp builder/o/$TARGET_CONFIG/images/rootfs.cpio ~/deploy/artifacts/$TARGET_CONFIG
     - store_artifacts:
         path: ~/deploy
         destination: images
@@ -90,6 +89,14 @@ jobs:
       - run:
           name: Create release notes
           command: grep -Pazo "(?s)(?<=## ${CIRCLE_TAG})[^#]+" ~/deploy/CHANGELOG.md | sed '/./,$!d' > ~/deploy/RELEASE_NOTES
+      - run:
+          name: Build archive
+          command: |
+            mkdir -p ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
+            mv ~/deploy/artifacts/nerves_initramfs_* ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
+            cd ~/deploy/artifacts && tar cfz nerves_initramfs-$CIRCLE_TAG.tar.gz nerves_initramfs-$CIRCLE_TAG
+            cd ~/deploy/artifacts && sha256sum nerves_initramfs-$CIRCLE_TAG.tar.gz > nerves_initramfs-$TARGET_CONFIG.tar.gz.sha256
+            rm -fr ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
       - store_artifacts:
           path: ~/deploy
           destination: images
