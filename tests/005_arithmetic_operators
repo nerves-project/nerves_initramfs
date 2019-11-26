@@ -1,0 +1,60 @@
+#!/bin/sh
+
+#
+# Test boolean operator precedence
+#
+
+cat >$CONFIG <<EOF
+
+6 == 6 -> info("Comparing numbers are the same works")
+6 == 4 -> info("Comparing numbers that are different works (shouldn't print)")
+6 != 4 -> info("Comparing numbers are different works")
+
+6 > 4 -> info("Comparing if numbers are greater than works")
+3 > 4 -> info("Comparing if numbers are great than works when false (shouldn't print)")
+4 < 6 -> info("Comparing if numbers are less than works")
+6 < 4 -> info("Comparing if numbers are less than works when false (shouldn't print)")
+
+4 >= 4 -> info("Comparing if numbers are greater than or equal works when both numbers are equal")
+6 >= 4 -> info("Comparing if numbers are greater than or equal works")
+2 >= 4 -> info("Comparing if numbers are greater than or equal when false (shouldn't print)")
+
+6 <= 6 -> info("Comparing if numbers are less than or equal works when both numbers are equal")
+6 <= 9 -> info("Comparing if numbers are less than or equal works")
+6 <= 3 -> info("Comparing if numbers are less than or equal when false (shouldn't print)")
+
+-1 + 5 == 4 -> info("Adding a negative number works")
+5 + (-1) == 4 -> info("Adding a negative number second works")
+
+3 + 4 - 3 - 2 + 2 == 4 -> info("Default order of operations work")
+
+3 + ( 4 - ((3 + 2) + 2)) == 0 -> info("Parens in arithmetic operations changes the order")
+
+false == 0 -> info("0 is false")
+EOF
+
+
+cat >$EXPECTED <<EOF
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mkdir("/mnt", 777)
+Comparing numbers are the same works
+Comparing numbers are different works
+Comparing if numbers are greater than works
+Comparing if numbers are less than works
+Comparing if numbers are greater than or equal works when both numbers are equal
+Comparing if numbers are greater than or equal works
+Comparing if numbers are less than or equal works when both numbers are equal
+Comparing if numbers are less than or equal works
+Adding a negative number works
+Adding a negative number second works
+Default order of operations work
+Parens in arithmetic operations changes the order
+0 is false
+fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
+fixture: unlink("/init")
+fixture: rmdir("/root")
+fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
+fixture: mount(".", "/", "(null)", 8192, data)
+fixture: chroot(.)
+Hello from the chained /sbin/init
+EOF
