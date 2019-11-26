@@ -89,8 +89,8 @@ platforms.
 If you're just building for one platform, run the following:
 
 ```sh
-./create-build.sh configs/nerves_initramfs_armel_defconfig o/armel
-cd o/armel
+./create-build.sh configs/nerves_initramfs_arm_defconfig o/arm
+cd o/arm
 make
 ```
 
