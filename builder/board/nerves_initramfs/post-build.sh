@@ -2,17 +2,14 @@
 
 set -e
 
-# Trim empty directories
-#
-# We're using .keep to make sure that the usr directory is around for the lib32 symlink,
-# but it's not used. If you want to keep all of the directories, don't run this
-# post-build script.
-#
-# This breaks rebuilding. To rebuild, run `mkdir -p target/usr/lib`
+# The default configurations only need init to be in the archive so
+# create the rootfs.cpio manually to only include it.
+mkdir -p "$BINARIES_DIR"
+cd "$TARGET_DIR" && echo init | cpio -o -H newC --owner=root:root > "$BINARIES_DIR/rootfs.cpio"
 
-find "$TARGET_DIR" -name .keep -delete
-find "$TARGET_DIR" -name os-release -delete
-find "$TARGET_DIR" -name lib64 -delete
-find "$TARGET_DIR" -name lib32 -delete
-find "$TARGET_DIR" -type d -empty -delete
+cd "$BINARIES_DIR" &&
+    (
+        gzip -k rootfs.cpio
+        xz -k rootfs.cpio
+    )
 

@@ -21,10 +21,6 @@ for config in $configs; do
 
     echo "Building $base..."
 
-    # If rebuilding, force a rebuild of nerves_initramfs and undo the prune of /usr/lib
-    # that breaks the os-release copy script.
-    mkdir -p o/$base/target/usr/lib
-    rm -fr o/$base/build/nerves_initramfs
     make -C o/$base
     if [[ $? != 0 ]]; then
         echo "--> 'Building $base' failed!"
