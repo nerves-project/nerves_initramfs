@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: nervesproject/nerves_system_br:1.9.4
+    - image: nervesproject/nerves_system_br:1.10.0
 
 install_ghr: &install_ghr
   run:
@@ -30,6 +30,8 @@ build_initramfs: &build_initramfs
         name: Copy initramfs images
         command: |
           cp builder/o/$TARGET_CONFIG/images/rootfs.cpio ~/deploy/artifacts/$TARGET_CONFIG
+          cp builder/o/$TARGET_CONFIG/images/rootfs.cpio.gz ~/deploy/artifacts/$TARGET_CONFIG.gz
+          cp builder/o/$TARGET_CONFIG/images/rootfs.cpio.xz ~/deploy/artifacts/$TARGET_CONFIG.xz
     - store_artifacts:
         path: ~/deploy
         destination: images
