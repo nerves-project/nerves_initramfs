@@ -34,21 +34,23 @@ described previously can be triggered.
 
 ## Boot configuration
 
-A simple configuration language is provided for handling the boot process.  The
-main construct is a rule. Rules are triggered by a condition and provide actions
-to run. Rules are evaluated sequentially through the configuration file.  Here's
-an example:
+`nerves_initramfs` is configured via rules in a file called
+`/nerves_initramfs.conf` in the initramfs. Be aware that `nerves_initramfs` will
+delete that file when it cleans up before switching to the true root filesystem.
+
+The `nerves_initramfs.conf` file uses a simple language for specifying rules and
+setting variables. Rules are composed of a condition and a list of actions .
+Here's an example:
 
 ```config
 boot.a && a.valid -> { rootfs.path="/dev/mmcblk0p2"; boot(); }
 ```
 
-A configuration file will contain a list of rules that define the logic for
-failing back to known good images or starting recovery.
+Real configuration files contain rules to handle fallback logic or set up root
+filesystem mounts that Linux wouldn't be able to do without help.
 
-The configuration file supports variable assignments and calls to functions.
-
-The following variables have special meanings:
+Variables can be defined and used as needed like other languages. The following
+variables have special uses:
 
 Variable           | Description
 -------------------|-------------
@@ -64,7 +66,7 @@ uboot_env.start    | The block offset of the U-Boot environment. (512 byte block
 uboot_env.count    | The number of blocks in the environment. Defaults to 256.
 run_repl           | True to run a REPL before booting. This is useful for debug. Defaults to `false`
 
-Some functions are supported:
+It's also possible to call built-in functions:
 
 Function           | Description
 -------------------|-------------
@@ -86,7 +88,7 @@ packages](https://buildroot.org/downloads/manual/manual.html#requirement).
 Change to the `builder` directory and run `./build-all.sh` to build for all
 platforms.
 
-If you're just building for one platform, run the following:
+If you're only building for one platform, run the following:
 
 ```sh
 ./create-build.sh configs/nerves_initramfs_arm_defconfig o/arm
@@ -102,6 +104,7 @@ your particular setup.
 
 The following strings must be in your kernel configuration:
 
+* `CONFIG_BLK_DEV_RAM=y`
 * `CONFIG_BLK_DEV_INITRD=y`
 * `CONFIG_RD_<compression>=y` - gzip compression is enabled by default, but if
   you want lz4, for example, you'll need to enable it.

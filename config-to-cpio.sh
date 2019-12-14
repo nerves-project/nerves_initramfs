@@ -1,9 +1,9 @@
 #!/bin/sh
 
 #
-# config-to-cpio.sh <config.txt> <output.cpio[.gz|.xz]>
+# config-to-cpio.sh <nerves_initramfs.conf> <output.cpio[.gz|.xz]>
 #
-# This script packages the specified config.txt file into an
+# This script packages the specified nerves_initramfs.conf file into an
 # optionally-compressed cpio file that can be concatenated to
 # nerves_initramfs.cpio.* to configure the initramfs.
 #
@@ -16,7 +16,7 @@ INPUT=$1
 OUTPUT=$2
 
 if [ -z $INPUT ]; then
-    echo "Please pass in a path to a config.txt"
+    echo "Please pass in a path to a configuration file"
     exit 1
 fi
 
@@ -37,9 +37,9 @@ case "$OUTPUT" in
 esac
 
 WORKDIR=$(mktemp -d)
-cp $INPUT $WORKDIR/config.txt
-(cd $WORKDIR; echo config.txt | cpio -o -H newC --owner=root:root 2>/dev/null | $COMPRESS > "$ABSOLUTE_OUTPUT")
-rm $WORKDIR/config.txt
+cp $INPUT $WORKDIR/nerves_initramfs.conf
+(cd $WORKDIR; echo nerves_initramfs.conf | cpio -o -H newC --owner=root:root --reproducible --quiet | $COMPRESS > "$ABSOLUTE_OUTPUT")
+rm $WORKDIR/nerves_initramfs.conf
 rmdir $WORKDIR
 
 exit 0

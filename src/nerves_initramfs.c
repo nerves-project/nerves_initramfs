@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     // Initialize scripting environment
     initialize_script_defaults(argc, argv);
 
-    eval_file("/boot.conf");
+    eval_file("/nerves_initramfs.conf");
 
     if (get_variable_as_boolean("run_repl"))
         repl();

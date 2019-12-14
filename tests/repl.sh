@@ -29,7 +29,7 @@ if [ ! -f $FIXTURE ]; then echo "Build $FIXTURE first"; exit 1; fi
 
 run() {
     CMDLINE=$*
-    CONFIG=$WORK/boot.conf
+    CONFIG=$WORK/nerves_initramfs.conf
 
     # Setup a fake root directory to simulate init boot
     rm -fr $WORK

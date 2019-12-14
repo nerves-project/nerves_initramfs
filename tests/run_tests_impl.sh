@@ -39,7 +39,7 @@ which $SED > /dev/null || SED=gsed
 
 run() {
     TEST=$1
-    CONFIG=$WORK/boot.conf
+    CONFIG=$WORK/nerves_initramfs.conf
     CMDLINE_FILE=$WORK/$TEST.cmdline
     EXPECTED=$WORK/$TEST.expected
 
