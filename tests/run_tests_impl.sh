@@ -20,7 +20,6 @@ RESULTS=$WORK/results
 INIT=$TESTS_DIR/../src/init
 FIXTURE=$TESTS_DIR/fixture/init_fixture.so
 
-CHAINED_INIT=$TESTS_DIR/fake_init
 
 # Collect the tests from the commandline
 TESTS=$*
@@ -47,24 +46,7 @@ run() {
 
     # Setup a fake root directory to simulate init boot
     rm -fr $WORK
-    mkdir -p $WORK/dev
-    ln -s $INIT $WORK/init
-    mkdir -p $WORK/sbin
-    ln -s $CHAINED_INIT $WORK/sbin/init
-
-    # Create the device containing a root filesystem
-    dd if=/dev/zero of=$WORK/dev/mmcblk0p2 bs=512 count=0 seek=1024 2>/dev/null
-    ln -s /dev/null $WORK/dev/null
-
-    # Fake active console
-    ln -s $(tty) $WORK/dev/ttyF1
-    ln -s $(tty) $WORK/dev/ttyAMA0
-    ln -s $(tty) $WORK/dev/tty1
-
-    # Loop and dm-crypt
-    mkdir -p $WORK/dev/mapper
-    touch $WORK/dev/mapper/control
-    touch $WORK/dev/loop0
+    source "$TESTS_DIR/init_fixture.sh"
 
     # Run the test script to setup files for the test
     source "$TESTS_DIR/$TEST"

@@ -1,6 +1,7 @@
 #include "script.h"
 #include "util.h"
 #include "parser.tab.h"
+#include "block_device.h"
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -550,6 +551,20 @@ static const struct term *function_saveenv(const struct term *parameters)
     set_boolean_variable("uboot_env.modified", false);
     return NULL;
 }
+static const struct term *function_blkid(const struct term *parameters)
+{
+    (void)parameters;
+    struct block_device_info *devices;
+
+    probe_block_devices(&devices);
+
+    for (struct block_device_info *device = devices; device; device = device->next) {
+        fprintf(stderr, "%s: PARTUUID=\"%s\"\n", device->path, device->partuuid);
+    }
+
+    free_block_devices(devices);
+    return NULL;
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -558,6 +573,7 @@ static struct function_info function_table[] = {
     {"=", 2, function_assign, NULL},
     {"+", 2, function_add, NULL},
     {"-", 2, function_subtract, NULL},
+    {"blkid", 0, function_blkid, "list block devices"},
     {"info", 0, function_info, "print any arguments to it"},
     {"help", 0, function_help, "print out help in the REPL"},
     {"vars", 0, function_vars, "print all known variables and their values"},
