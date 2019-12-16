@@ -78,7 +78,7 @@ run() {
     # Run init
     # NOTE: Call 'exec' so that it's possible to set argv0, but that means we
     #       need a subshell - hence the parentheses.
-    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$WORK exec -a /init $INIT $CMDLINE 2> $RESULTS.raw)
+    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$WORK exec -a /init $INIT $CMDLINE) 2> $RESULTS.raw
 
     # Trim the results of known lines that vary between runs
     # The calls to sed fixup differences between getopt implementations.
