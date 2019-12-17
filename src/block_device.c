@@ -205,7 +205,32 @@ void free_block_devices(struct block_device_info *devices)
     }
 }
 
-int probe_partuuids()
+static int find_block_device_by_partuuid(const char *uuid, char *path)
 {
-    return 0;
+    struct block_device_info *devices;
+    if (probe_block_devices(&devices) < 0)
+        return -1;
+
+    int rc = -1;
+    for (struct block_device_info *device = devices; device; device = device->next) {
+        if (strcmp(uuid, device->partuuid) == 0) {
+            strcpy(path, device->path);
+            rc = 0;
+            break;
+        }
+    }
+    free_block_devices(devices);
+    return rc;
+}
+
+int find_block_device_by_spec(const char *spec, char *path)
+{
+    if (strncmp("PARTUUID=", spec, 9) == 0) {
+        // Handle partition UUID
+        return find_block_device_by_partuuid(&spec[9], path);
+    } else {
+        // Assume path
+        strcpy(path, spec);
+        return 0;
+    }
 }
