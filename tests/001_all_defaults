@@ -1,10 +1,10 @@
 #!/bin/sh
 
 #
-# Test that no options does the expected
+# Test that no options and no configuration does the expected
 #
 
-cat >$CMDLINE_FILE <<EOF
+cat >$CONFIG <<EOF
 EOF
 
 cat >$EXPECTED <<EOF
