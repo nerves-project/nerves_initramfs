@@ -18,23 +18,32 @@
 #include "util.h"
 #include "linenoise.h"
 #include "script.h"
+#include "block_device.h"
 
 // Global U-Boot environment data
 struct uboot_env working_uboot_env;
 
+static int open_block_device(const char *spec, int flags, char *path)
+{
+    if (find_block_device_by_spec(spec, path) < 0)
+        return -1;
+
+    return open(path, flags);
+}
+
 // Files in /dev populate asynchronously so this lets us wait for them to show up.
-static int retry_open(const char *path, int flags)
+static int retry_open_block_device(const char *spec, int flags, char *path)
 {
     int tries = 1000;
-    int fd = open(path, flags);
+    int fd = open_block_device(spec, flags, path);
     while (fd < 0 && tries > 0) {
         usleep(10);
-        fd = open(path, flags);
+        fd = open_block_device(spec, flags, path);
         tries--;
     }
 
     if (fd < 0)
-        fatal("Timed out waiting for %s", path);
+        fatal("Timed out waiting for '%s'", spec);
 
     return fd;
 }
@@ -52,7 +61,7 @@ static int losetup(int rootfs_fd)
 
 static int dm_create(off_t rootfs_size, const char *cipher, const char *secret)
 {
-    int dm_control = retry_open("/dev/mapper/control", O_RDWR);
+    int dm_control = open("/dev/mapper/control", O_RDWR);
 
     uint8_t request_buffer[16384];
     struct dm_ioctl *dm = (struct dm_ioctl *) request_buffer;
@@ -175,16 +184,18 @@ static void setup_initramfs()
 static void mount_fs(const char *rootfs, const char *rootfs_type)
 {
     // Wait for the rootfs to appear
-    int rootfs_fd = retry_open(rootfs, O_RDONLY);
+    char rootfs_path[BLOCK_DEVICE_PATH_LEN];
+    int rootfs_fd = retry_open_block_device(rootfs, O_RDONLY, rootfs_path);
     close(rootfs_fd);
 
-    OK_OR_FATAL(mount(rootfs, "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s", rootfs_type, rootfs);
+    OK_OR_FATAL(mount(rootfs_path, "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
 }
 
 static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, const char *cipher, const char *secret)
 {
     // Wait for the rootfs to appear
-    int rootfs_fd = retry_open(rootfs, O_RDONLY);
+    char rootfs_path[BLOCK_DEVICE_PATH_LEN];
+    int rootfs_fd = retry_open_block_device(rootfs, O_RDONLY, rootfs_path);
     off_t rootfs_size = lseek(rootfs_fd, 0, SEEK_END);
     (void) lseek(rootfs_fd, 0, SEEK_SET);
 
@@ -193,7 +204,7 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 
     dm_create(rootfs_size, cipher, secret);
 
-    OK_OR_FATAL(mount("/dev/dm-0", "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s", rootfs_type, rootfs);
+    OK_OR_FATAL(mount("/dev/dm-0", "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
 
     // It's ok to close loop_fd now that the mount happened.
     close(loop_fd);

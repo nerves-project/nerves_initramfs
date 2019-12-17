@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#
+# Specify a GPT partition by UUID
+#
+
+cat >$CONFIG <<EOF
+rootfs.path="PARTUUID=7e7b6f06-8aaf-42c6-9c3b-6ede014885a6"
+EOF
+
+cat >$EXPECTED <<EOF
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mkdir("/mnt", 777)
+fixture: mount("/dev/mmcblk0p5", "/mnt", "squashfs", 1, data)
+fixture: unlink("/init")
+fixture: rmdir("/root")
+fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
+fixture: mount(".", "/", "(null)", 8192, data)
+fixture: chroot(.)
+Hello from the chained /sbin/init
+EOF
+
