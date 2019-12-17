@@ -49,13 +49,15 @@ boot.a && a.valid -> { rootfs.path="/dev/mmcblk0p2"; boot(); }
 Real configuration files contain rules to handle fallback logic or set up root
 filesystem mounts that Linux wouldn't be able to do without help.
 
+### Variables
+
 Variables can be defined and used as needed like other languages. The following
 variables have special uses:
 
 Variable           | Description
 -------------------|-------------
 rootfs.fstype      | Root filesystem time. Defaults to "squashfs"
-rootfs.path        | Root filesystem path. Defaults to "/dev/mmcblk0p2"
+rootfs.path        | Root filesystem path or spec. Defaults to "/dev/mmcblk0p2"
 rootfs.encrypted   | True if the filesystem is encrypted. Defaults to `false`
 rootfs.cipher      | The cipher used to encrypt the filesystem. For example, "aes-cbc-plain"
 rootfs.secret      | The secret key as hex digits
@@ -66,18 +68,33 @@ uboot_env.start    | The block offset of the U-Boot environment. (512 byte block
 uboot_env.count    | The number of blocks in the environment. Defaults to 256.
 run_repl           | True to run a REPL before booting. This is useful for debug. Defaults to `false`
 
+### Functions
+
 It's also possible to call built-in functions:
 
 Function           | Description
 -------------------|-------------
-info(...)          | Prints any arguments passed to it
+blkid()            | Print out information about all block devices
 help()             | Print out help when running in the REPL
-vars()             | Print out all known variables and their values
-loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
+info(...)          | Prints any arguments passed to it
 env()              | Print out all loaded U-Boot variables
-setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
 getenv(key)        | Get the value of a U-Boot variable
+loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
 saveenv()          | Save all U-Boot variables back to storage
+setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
+vars()             | Print out all known variables and their values
+
+### Block device specifications
+
+Block devices, such as `/dev/sda2`, are either specified as absolute paths or
+using the Linux match syntax. Currently only `PARTUUID` is supported for
+identifying a partition by its UUID. Use the `blkid` function or the `blkid`
+commandline utility in Linux to list information about block devices.
+
+If you are only using one storage device, using absolute paths to block devices
+is fine. If you have more than one storage device, Linux sometimes can enumerate
+them in a different order so `/dev/sda` could be `/dev/sdb` sometimes. The way
+around this is to identify devices by UUID.
 
 ## Building
 
