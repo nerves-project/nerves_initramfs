@@ -11,11 +11,11 @@ EOF
 cat >$EXPECTED <<EOF
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mkdir("/mnt", 777)
-/dev/mmcblk0p5: PARTUUID="7e7b6f06-8aaf-42c6-9c3b-6ede014885a6"
-/dev/mmcblk0p2: PARTUUID="fcc205c8-2f1c-4dcd-bef4-7b209aa15cca"
 /dev/mmcblk0p1: PARTUUID="5278721d-0089-4768-85df-b8f1b97e6684"
-/dev/sda2: PARTUUID="3fc3e2d4-02"
+/dev/mmcblk0p2: PARTUUID="fcc205c8-2f1c-4dcd-bef4-7b209aa15cca"
+/dev/mmcblk0p5: PARTUUID="7e7b6f06-8aaf-42c6-9c3b-6ede014885a6"
 /dev/sda1: PARTUUID="3fc3e2d4-01"
+/dev/sda2: PARTUUID="3fc3e2d4-02"
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: unlink("/init")
 fixture: rmdir("/root")

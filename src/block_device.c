@@ -98,17 +98,17 @@ static int probe_gpt_devices(int fd, const char *devname, struct block_device_in
     }
 
     const char *p = p_or_np(devname);
-    uint8_t *partition = partitions;
-    for (uint32_t i = 0; i < partition_count; i++) {
+    uint8_t *partition = partitions + partition_size * partition_count;
+    for (uint32_t i = partition_count; i > 0; i--) {
+        partition -= partition_size;
+
         if (!is_zeros(partition, 16)) {
             struct block_device_info *blkdev = alloc_blkdev();
             blkdev->next = *devices;
-            snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i + 1);
+            snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i);
             uuid_to_string_me(&partition[16], blkdev->partuuid);
             *devices = blkdev;
         }
-
-        partition += partition_size;
     }
 
     free(partitions);
@@ -136,17 +136,17 @@ static int probe_mbr_devices(int fd, const char *devname, struct block_device_in
 
     // Enumerate the primary partitions
     const char *p = p_or_np(devname);
-    const uint8_t *partition = &mbr[446];
-    for (int i = 0; i < 4; i++) {
+    const uint8_t *partition = &mbr[446 + 4*16];
+    for (int i = 4; i > 0; i--) {
         // If non-empty partition
+        partition -= 16;
         if (partition[4] != 0) {
             struct block_device_info *blkdev = alloc_blkdev();
             blkdev->next = *devices;
-            snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i + 1);
-            snprintf(blkdev->partuuid, sizeof(blkdev->partuuid), "%08x-%02x", disk_uuid, i + 1);
+            snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i);
+            snprintf(blkdev->partuuid, sizeof(blkdev->partuuid), "%08x-%02x", disk_uuid, i);
             *devices = blkdev;
         }
-        partition += 16;
     }
     return 0;
 }
@@ -170,6 +170,11 @@ static int probe_partitions(const char *devname, struct block_device_info **devi
     return rc;
 }
 
+static int reverse_alphasort(const struct dirent **a, const struct dirent **b)
+{
+    return alphasort(b, a);
+}
+
 int probe_block_devices(struct block_device_info **devices)
 {
     *devices = NULL;
@@ -178,7 +183,7 @@ int probe_block_devices(struct block_device_info **devices)
     int n = scandir("/sys/block",
                     &namelist,
                     NULL,
-                    NULL);
+                    reverse_alphasort);
     int i;
     for (i = 0; i < n; i++) {
         if (namelist[i]->d_name[0] == '.')
