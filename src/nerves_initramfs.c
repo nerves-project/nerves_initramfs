@@ -118,16 +118,27 @@ static int dm_create(off_t rootfs_size, const char *cipher, const char *secret)
     return 0;
 }
 
+static void cleanup_old_rootfs()
+{
+    // This should erase all files and not just the ones we know of
+    (void) unlink("/init");
+    (void) unlink("/nerves_initramfs.cfg");
+    (void) rmdir("/root");
+    (void) rmdir("/sys");
+}
+
 static void switch_root()
 {
     // Thank you busybox for all of the comments on how this is supposed to work.
 
-    // Remove the files in the "old" rootfs.
-    OK_OR_DEBUG(unlink("/init"), "unlink /init failed");
-    OK_OR_DEBUG(rmdir("/root"), "removing /root failed");
-
     // Move /dev to its new home
     OK_OR_WARN(mount("/dev", "/mnt/dev", NULL, MS_MOVE, NULL), "moving /dev failed");
+
+    // Unmount /sys so that the next init can mount it
+    OK_OR_WARN(umount("/sys"), "unmounting /sys failed");
+
+    // Clean up the "old" rootfs.
+    cleanup_old_rootfs();
 
     // Change to the new mount
     OK_OR_DEBUG(chdir("/mnt"), "chdir /mnt failed");
@@ -174,11 +185,15 @@ void dump_files(const char *path)
 
 static void setup_initramfs()
 {
+    // Create necessary directories in case they're not around.
+    (void) mkdir("/mnt", 0777);
+    (void) mkdir("/dev", 0777);
+    (void) mkdir("/sys", 0777);
+
     // devtmpfs must be enabled in the kernel. It must be manually mounted for the initramfs.
     OK_OR_WARN(mount("devtmpfs", "/dev", "devtmpfs", MS_NOEXEC | MS_NOSUID, "mode=755,size=5%"), "Cannot mount /dev");
 
-    // Try creating the mount directory in case it doesn't exist
-    (void) mkdir("/mnt", 0777);
+    OK_OR_WARN(mount("sysfs", "/sys", "sysfs", MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL), "Cannot mount /sys");
 }
 
 static void mount_fs(const char *rootfs, const char *rootfs_type)
