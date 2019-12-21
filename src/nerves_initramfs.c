@@ -264,8 +264,6 @@ static void initialize_script_defaults(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    (void) argc;
-
     if (getpid() != 1)
        fatal("Must be pid 1");
 
