@@ -9,6 +9,7 @@ defmodule Demo.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Demo.Supervisor]
+
     children =
       [
         # Children for all targets
