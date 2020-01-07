@@ -253,12 +253,25 @@ static void initialize_script_defaults(int argc, char *argv[])
 
     set_boolean_variable("run_repl", false);
 
-    // Scan kernel parameters for variable overrides
+    // Scan the commandline for more parameters to set
+    // Parameters are of the form:
+    //
+    //   --nerves_initramfs=key
+    // or
+    //   --nerves_initramfs=key=value
     for (int i = 1; i < argc; i++) {
-        if (strncmp("root=", argv[i], 5) == 0)
-            set_string_variable("rootfs.path", &argv[i][5]);
-        if (strncmp("rootfstype=", argv[i], 11) == 0)
-            set_string_variable("rootfs.fstype", &argv[i][11]);
+        if (strncmp("--nerves_initramfs=", argv[i], 19) == 0) {
+            char *key = argv[i] + 19;
+            char *equals = strchr(key, '=');
+
+            if (equals) {
+                *equals = '\0';
+
+                set_string_variable(key, equals + 1);
+            } else {
+                set_boolean_variable(key, true);
+            }
+        }
     }
 }
 
