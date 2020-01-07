@@ -2,10 +2,14 @@
 
 set -e
 
-# The default configurations only need init to be in the archive so
-# create the rootfs.cpio manually to only include it.
+# The default configuration only requires a subset
+# of the files in the target directory. They're
+# listed here:
+
+FILES="init\nusr/bin/fwup"
+
 mkdir -p "$BINARIES_DIR"
-cd "$TARGET_DIR" && echo init | cpio -o -H newC --owner=root:root --reproducible --quiet > "$BINARIES_DIR/rootfs.cpio"
+cd "$TARGET_DIR" && echo $FILES | cpio -o -H newC --owner=root:root --reproducible --quiet > "$BINARIES_DIR/rootfs.cpio"
 
 # Notes on compressor options:
 #
