@@ -6,13 +6,19 @@
 extern int yylex(void);
 extern int yyerror(const char *s);
 
+const struct term *parser_result;
+
 %}
 
 // Symbols.
 %union
 {
     bool boolean;
+
+    // Differentiate const vs. non-const term.
+    // Building terms -> non-const, Using terms -> const
     struct term *term;
+    const struct term *const_term;
 };
 
 %token <boolean> BOOLEAN
@@ -24,7 +30,11 @@ extern int yyerror(const char *s);
 %token AND OR NOT NEQ LT LTE EQ GTE GT ARROW
 
 %type <boolean> BooleanExpression Comparison
-%type <term> term Parameters FunctionCall Action Actions ActionBlock Assignment
+
+%type <term> term Parameters Action Actions FunctionCall Assignment
+
+// Once terms are in statements and blocks, force them const to avoid mistakes
+%type <const_term> Statements Statement ActionBlock
 
 %left '-' '+'
 %nonassoc UMINUS
@@ -32,13 +42,13 @@ extern int yyerror(const char *s);
 %%
 
 Statements:
-  /* empty */
-  | Statements Statement
+  /* empty */  { parser_result = NULL; }
+  | Statements Statement { parser_result = $2; }
   ;
 
 Statement:
-  Rule
-  | Action { run_functions($1); }
+  Rule { $$ = NULL; }
+  | Action { $$ = run_functions($1); }
   ;
 
 Rule:
@@ -46,7 +56,7 @@ Rule:
   ;
 
 ActionBlock:
-  Action
+  Action { $$ = $1; }
   | '{' Actions '}' { $$ = $2; }
   ;
 

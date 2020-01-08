@@ -50,7 +50,7 @@ struct function_info
 fun_handler lookup_function(const char *name, int arity);
 const struct function_info *function_info_by_fun(fun_handler fun);
 
-void run_functions(const struct term *rv);
+const struct term *run_functions(const struct term *rv);
 
 void term_gc_heap();
 struct term *term_new_number(int value);

@@ -216,12 +216,14 @@ static const struct term *run_function(const struct term *rv)
         return term_new_boolean(false);
 }
 
-void run_functions(const struct term *rv)
+const struct term *run_functions(const struct term *rv)
 {
+    const struct term *last_result = NULL;
     while (rv) {
-        run_function(rv);
+        last_result = run_function(rv);
         rv = rv->next;
     }
+    return last_result;
 }
 
 const struct term *term_resolve(const struct term *rv)

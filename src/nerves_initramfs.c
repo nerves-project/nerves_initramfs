@@ -227,10 +227,13 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 
 static void repl()
 {
+    extern const struct term *parser_result;
     char *line;
     while((line = linenoise("nerves_initramfs> ")) != NULL) {
         linenoiseHistoryAdd(line);
-        eval_string(line); // eval_string owns memory and calls free.
+        eval_string(line); // eval_string owns memory and calls free on "line".
+        if (parser_result)
+            printf("%s\n", term_to_string(parser_result)->string);
     }
 }
 
