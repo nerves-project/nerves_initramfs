@@ -2,6 +2,7 @@
 #include "util.h"
 #include "parser.tab.h"
 #include "block_device.h"
+#include "cmd.h"
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -565,6 +566,26 @@ static const struct term *function_blkid(const struct term *parameters)
     free_block_devices(devices);
     return NULL;
 }
+static const struct term *function_cmd(const struct term *parameters)
+{
+    const int max_args = 15;
+    const char *argv[max_args + 1];
+    int index = 0;
+    while (parameters && index < max_args) {
+        const struct term *str = term_to_string(parameters);
+        argv[index] = str->string;
+        parameters = parameters->next;
+        index++;
+    }
+    argv[index] = 0;
+
+    char output_buffer[256];
+    output_buffer[0] = '\0';
+    if (system_cmd(argv, output_buffer, sizeof(output_buffer)) != 0)
+        info("Ignoring non-zero exit from %s", argv[0]);
+
+    return term_new_string(output_buffer);
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -574,6 +595,7 @@ static struct function_info function_table[] = {
     {"+", 2, function_add, NULL},
     {"-", 2, function_subtract, NULL},
     {"blkid", 0, function_blkid, "list block devices"},
+    {"cmd", 1, function_cmd, "run an external command"},
     {"info", 0, function_info, "print any arguments to it"},
     {"help", 0, function_help, "print out help in the REPL"},
     {"vars", 0, function_vars, "print all known variables and their values"},

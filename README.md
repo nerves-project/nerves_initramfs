@@ -88,6 +88,8 @@ It's also possible to call built-in functions:
 Function           | Description
 -------------------|-------------
 blkid()            | Print out information about all block devices
+cmd()              | Run an external program. The first argument is the path to
+                   | the program, the next is the first argument, and so on.
 help()             | Print out help when running in the REPL
 info(...)          | Prints any arguments passed to it
 env()              | Print out all loaded U-Boot variables
