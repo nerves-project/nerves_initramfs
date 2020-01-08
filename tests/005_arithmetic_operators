@@ -4,7 +4,7 @@
 # Test boolean operator precedence
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 
 6 == 6 -> info("Comparing numbers are the same works")
 6 == 4 -> info("Comparing numbers that are different works (shouldn't print)")
@@ -34,7 +34,7 @@ false == 0 -> info("0 is false")
 EOF
 
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

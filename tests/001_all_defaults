@@ -4,10 +4,10 @@
 # Test that no options and no configuration does the expected
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 EOF
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

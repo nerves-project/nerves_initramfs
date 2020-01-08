@@ -4,11 +4,11 @@
 # Test that cmd can run a program
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 cmd("/usr/bin/fwup", "a", "b", "c")
 EOF
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

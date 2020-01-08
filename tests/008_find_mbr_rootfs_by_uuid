@@ -4,11 +4,11 @@
 # Specify a MBR partition by UUID
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 rootfs.path="PARTUUID=3fc3e2d4-02"
 EOF
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

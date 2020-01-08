@@ -4,7 +4,7 @@
 # Test boolean operator precedence
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 true && true || false || false && false -> info("&& and || logic works")
 true && (true || (false || false)) && false -> info("Should not print")
 
@@ -13,7 +13,7 @@ true == true && false -> info("Should not print")
 EOF
 
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

@@ -4,12 +4,12 @@
 # Test that cmd can run a program
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 result = cmd("/usr/bin/boardid")
 info("Result is ", result)
 EOF
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)

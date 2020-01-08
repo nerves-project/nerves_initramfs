@@ -4,13 +4,13 @@
 # Test that no options does the expected
 #
 
-cat >$CONFIG <<EOF
+cat >"$CONFIG" <<EOF
 rootfs.cipher = "aes-cbc-plain"
 rootfs.secret = "8e9c0780fd7f5d00c18a30812fe960cfce71f6074dd9cded6aab2897568cc856"
 rootfs.encrypted = true
 EOF
 
-cat >$EXPECTED <<EOF
+cat >"$EXPECTED" <<EOF
 fixture: mkdir("/mnt", 777)
 fixture: mkdir("/dev", 777)
 fixture: mkdir("/sys", 777)
