@@ -107,6 +107,7 @@ term:
   | STRING
   | NUMBER
   | BOOLEAN { $$ = term_new_boolean($1); }
+  | FunctionCall
   ;
 
 %%

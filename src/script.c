@@ -569,7 +569,7 @@ static const struct term *function_blkid(const struct term *parameters)
 static const struct term *function_cmd(const struct term *parameters)
 {
     const int max_args = 15;
-    const char *argv[max_args + 1];
+    char *argv[max_args + 1];
     int index = 0;
     while (parameters && index < max_args) {
         const struct term *str = term_to_string(parameters);
@@ -583,6 +583,10 @@ static const struct term *function_cmd(const struct term *parameters)
     output_buffer[0] = '\0';
     if (system_cmd(argv, output_buffer, sizeof(output_buffer)) != 0)
         info("Ignoring non-zero exit from %s", argv[0]);
+
+    // Trim the output before returning since that's what's expected
+    // in practice. There's usually a newline to trim anyway.
+    trim_string_in_place(output_buffer);
 
     return term_new_string(output_buffer);
 }

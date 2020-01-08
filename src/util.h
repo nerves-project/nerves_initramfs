@@ -54,7 +54,10 @@ void fatal(const char *fmt, ...);
 #include "compat.h"
 #endif
 
-extern struct uboot_env working_uboot_env;
+// String functions
+void trim_string_in_place(char *str);
 
+// Globals
+extern struct uboot_env working_uboot_env;
 
 #endif // UTIL_H

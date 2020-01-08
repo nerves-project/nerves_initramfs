@@ -23,14 +23,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "util.h"
 
+#include <ctype.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 static int format_message(char **strp, const char *fmt, va_list ap)
 {
@@ -92,4 +94,17 @@ void fatal(const char *fmt, ...)
     exit(1);
 }
 
+void trim_string_in_place(char *str)
+{
+    char *first = str;
+    while (*first && isspace(*first))
+        first++;
 
+    char *last = first + strlen(first) - 1;
+    while (last != first && isspace(*last))
+        last--;
+
+    size_t len = last - first + 1;
+    memmove(str, first, len);
+    str[len] = '\0';
+}

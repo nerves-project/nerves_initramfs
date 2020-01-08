@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Print out a serial number
+echo "ABC1234567"

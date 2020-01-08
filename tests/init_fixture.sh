@@ -12,6 +12,7 @@ mkdir -p $WORK/sbin
 mkdir -p $WORK/usr/bin
 ln -s $TESTS_DIR/fake_init $WORK/sbin/init
 ln -s $TESTS_DIR/fake_fwup $WORK/usr/bin/fwup
+ln -s $TESTS_DIR/fake_boardid $WORK/usr/bin/boardid
 
 # Create the device containing a root filesystem
 dd if=/dev/zero of=$WORK/dev/mmcblk0p2 bs=512 count=0 seek=1024 2>/dev/null
