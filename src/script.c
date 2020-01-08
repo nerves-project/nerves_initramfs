@@ -4,6 +4,7 @@
 #include "block_device.h"
 #include "cmd.h"
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -592,6 +593,27 @@ static const struct term *function_cmd(const struct term *parameters)
 
     return term_new_string(output_buffer);
 }
+static const struct term *function_ls(const struct term *parameters)
+{
+    const char *path = parameters ? term_to_string(parameters)->string : "/";
+
+    struct dirent **namelist;
+    int n = scandir(path,
+                    &namelist,
+                    NULL,
+                    alphasort);
+    int i;
+    for (i = 0; i < n; i++) {
+        fprintf(stderr, "%-32s%s\n",  namelist[i]->d_name, (namelist[i]->d_type == DT_DIR ? "<DIR>" : ""));
+    }
+
+    if (n >= 0) {
+        for (i = 0; i < n; i++)
+            free(namelist[i]);
+        free(namelist);
+    }
+    return NULL;
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -604,6 +626,7 @@ static struct function_info function_table[] = {
     {"cmd", 1, function_cmd, "run an external command"},
     {"info", 0, function_info, "print any arguments to it"},
     {"help", 0, function_help, "print out help in the REPL"},
+    {"ls", 0, function_ls, "list files"},
     {"vars", 0, function_vars, "print all known variables and their values"},
     {"env", 0, function_env, "print all loaded U-Boot variables"},
     {"loadenv", 0, function_loadenv, "load a U-Boot environment block"},
