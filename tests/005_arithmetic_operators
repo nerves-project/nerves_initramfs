@@ -28,7 +28,7 @@ cat >"$CONFIG" <<EOF
 
 3 + 4 - 3 - 2 + 2 == 4 -> info("Default order of operations work")
 
-3 + ( 4 - ((3 + 2) + 2)) == 0 -> info("Parens in arithmetic operations changes the order")
+3 + ( 4 - ((3 + 2) + 2)) == 0 -> info("Parentheses in arithmetic operations changes the order")
 
 false == 0 -> info("0 is false")
 EOF
@@ -51,7 +51,7 @@ Comparing if numbers are less than or equal works
 Adding a negative number works
 Adding a negative number second works
 Default order of operations work
-Parens in arithmetic operations changes the order
+Parentheses in arithmetic operations changes the order
 0 is false
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
