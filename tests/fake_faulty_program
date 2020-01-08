@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "Oops"
+
+# Exit failure here
+exit 1
