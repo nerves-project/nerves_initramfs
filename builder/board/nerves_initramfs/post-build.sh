@@ -6,7 +6,7 @@ set -e
 # of the files in the target directory. They're
 # listed here:
 
-FILES="init\nusr/bin/fwup"
+FILES="init\nusr\nusr/bin\nusr/bin/fwup"
 
 mkdir -p "$BINARIES_DIR"
 cd "$TARGET_DIR" && echo $FILES | cpio -o -H newC --owner=root:root --reproducible --quiet > "$BINARIES_DIR/rootfs.cpio"
