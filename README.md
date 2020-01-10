@@ -92,6 +92,7 @@ cmd()              | Run an external program. The first argument is the path to
                    | the program, the next is the first argument, and so on.
 help()             | Print out help when running in the REPL
 info(...)          | Prints any arguments passed to it
+ls()               | List files a directory
 env()              | Print out all loaded U-Boot variables
 getenv(key)        | Get the value of a U-Boot variable
 loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
