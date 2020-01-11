@@ -1,6 +1,9 @@
 # Demo
 
-**TODO: Add description**
+This "works", but has so many manual steps that unless you're talking to me,
+it's probably best to browse rather than try to make run.
+
+I'll be fixing it!!!!
 
 ## Targets
 

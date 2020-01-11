@@ -1,0 +1,1 @@
+../../../config-to-cpio.sh
