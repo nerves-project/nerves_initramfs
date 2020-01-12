@@ -30,12 +30,33 @@ fi
 if [ ! -f "$INIT" ]; then echo "Build $INIT first"; exit 1; fi
 if [ ! -f "$FIXTURE" ]; then echo "Build $FIXTURE first"; exit 1; fi
 
-SED=sed
-command -v $SED || SED=gsed
+# Host-specific options
+case $(uname -s) in
+    Darwin)
+	    # Not -d?
+        BASE64_DECODE=-D
+
+        SED=/usr/local/bin/gsed
+        [ -e $SED ] || ( echo "Please run 'brew install gnu-sed' to install gsed"; exit 1 )
+        ;;
+    *)
+	    SED=sed
+        BASE64_DECODE=-d
+        ;;
+esac
+
+base64_decode() {
+    base64 $BASE64_DECODE
+}
+
+base64_decodez() {
+    base64 $BASE64_DECODE | zcat
+}
 
 run() {
     TEST=$1
     CONFIG=$WORK/nerves_initramfs.conf
+    POST_TEST_CHECK=$WORK/post-test.sh
     CMDLINE_FILE=$WORK/$TEST.cmdline
     EXPECTED=$WORK/$TEST.expected
 
@@ -69,8 +90,15 @@ run() {
     # check results
     diff -w "$RESULTS" "$EXPECTED"
     if [ $? != 0 ]; then
-        echo "Test $TEST failed!"
+        echo "$TEST: Results didn't match expected!"
         exit 1
+    fi
+
+    if [ -f "$POST_TEST_CHECK" ]; then
+        if ! bash "$POST_TEST_CHECK"; then
+            echo "$TEST: The post-test check failed!"
+            exit 1
+        fi
     fi
 }
 
