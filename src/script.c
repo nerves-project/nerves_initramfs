@@ -454,14 +454,16 @@ static const struct term *function_env(const struct term *parameters)
 static const struct term *function_loadenv(const struct term *parameters)
 {
     (void)parameters;
-    const char *devpath = get_variable_as_string("uboot_env.path");
+    const char *devpathspec = get_variable_as_string("uboot_env.path");
+    char devpath[BLOCK_DEVICE_PATH_LEN];
+
     int block = get_variable_as_number("uboot_env.start");
     int block_count = get_variable_as_number("uboot_env.count");
 
     working_uboot_env.env_size = block_count * 512;
-    int fd = open(devpath, O_RDONLY);
+    int fd = open_block_device(devpathspec, O_RDONLY, devpath);
     if (fd < 0) {
-        info("Could not open '%s'", devpath);
+        info("Could not open '%s'", devpathspec);
         return NULL;
     }
     if (lseek(fd, block * 512, SEEK_SET) < 0) {
@@ -522,14 +524,16 @@ static const struct term *function_saveenv(const struct term *parameters)
 {
     (void)parameters;
 
-    const char *devpath = get_variable_as_string("uboot_env.path");
+    const char *devpathspec = get_variable_as_string("uboot_env.path");
+    char devpath[BLOCK_DEVICE_PATH_LEN];
+
     int block = get_variable_as_number("uboot_env.start");
     int block_count = get_variable_as_number("uboot_env.count");
 
     working_uboot_env.env_size = block_count * 512;
-    int fd = open(devpath, O_WRONLY);
+    int fd = open_block_device(devpathspec, O_WRONLY, devpath);
     if (fd < 0) {
-        info("Could not open '%s'", devpath);
+        info("Could not open '%s'", devpathspec);
         return NULL;
     }
     if (lseek(fd, block * 512, SEEK_SET) < 0) {

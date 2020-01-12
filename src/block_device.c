@@ -239,3 +239,11 @@ int find_block_device_by_spec(const char *spec, char *path)
         return 0;
     }
 }
+
+int open_block_device(const char *spec, int flags, char *path)
+{
+    if (find_block_device_by_spec(spec, path) < 0)
+        return -1;
+
+    return open(path, flags);
+}

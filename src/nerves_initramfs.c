@@ -23,14 +23,6 @@
 // Global U-Boot environment data
 struct uboot_env working_uboot_env;
 
-static int open_block_device(const char *spec, int flags, char *path)
-{
-    if (find_block_device_by_spec(spec, path) < 0)
-        return -1;
-
-    return open(path, flags);
-}
-
 // Files in /dev populate asynchronously so this lets us wait for them to show up.
 static int retry_open_block_device(const char *spec, int flags, char *path)
 {
