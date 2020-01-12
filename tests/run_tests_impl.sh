@@ -23,18 +23,15 @@ FIXTURE=$TESTS_DIR/fixture/init_fixture.so
 
 # Collect the tests from the commandline
 TESTS=$*
-if [ -z $TESTS ]; then
+if [ -z "$TESTS" ]; then
     TESTS=$(ls $TESTS_DIR/[0-9][0-9][0-9]_*)
 fi
 
-# Just in case there are some leftover from a previous test, clear it out
-rm -fr $WORK
-
-if [ ! -f $INIT ]; then echo "Build $INIT first"; exit 1; fi
-if [ ! -f $FIXTURE ]; then echo "Build $FIXTURE first"; exit 1; fi
+if [ ! -f "$INIT" ]; then echo "Build $INIT first"; exit 1; fi
+if [ ! -f "$FIXTURE" ]; then echo "Build $FIXTURE first"; exit 1; fi
 
 SED=sed
-which $SED > /dev/null || SED=gsed
+command -v $SED || SED=gsed
 
 run() {
     TEST=$1
@@ -45,14 +42,14 @@ run() {
     echo Running $TEST...
 
     # Setup a fake root directory to simulate init boot
-    rm -fr $WORK
+    rm -fr "$WORK"
     source "$TESTS_DIR/init_fixture.sh"
 
     # Run the test script to setup files for the test
     source "$TESTS_DIR/$TEST"
 
-    if [ -e $CMDLINE_FILE ]; then
-        CMDLINE=$(cat $CMDLINE_FILE)
+    if [ -e "$CMDLINE_FILE" ]; then
+        CMDLINE=$(cat "$CMDLINE_FILE")
     else
         CMDLINE=
     fi
@@ -64,25 +61,25 @@ run() {
 
     # Trim the results of known lines that vary between runs
     # The calls to sed fixup differences between getopt implementations.
-    cat $RESULTS.raw | \
+    cat "$RESULTS.raw" | \
         grep -v "Starting init" | \
         $SED -e "s/\`/'/g" \
-        > $RESULTS
+        > "$RESULTS"
 
     # check results
-    diff -w $RESULTS $EXPECTED
+    diff -w "$RESULTS" "$EXPECTED"
     if [ $? != 0 ]; then
-        echo Test $TEST failed!
+        echo "Test $TEST failed!"
         exit 1
     fi
 }
 
 # Test command line arguments
 for TEST_CONFIG in $TESTS; do
-    TEST=$(/usr/bin/basename $TEST_CONFIG .expected)
-    run $TEST
+    TEST=$(/usr/bin/basename "$TEST_CONFIG" .expected)
+    run "$TEST"
 done
 
-rm -fr $WORK
+rm -fr "$WORK"
 echo Pass!
 exit 0
