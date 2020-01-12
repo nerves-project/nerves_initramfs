@@ -446,7 +446,7 @@ static const struct term *function_env(const struct term *parameters)
     (void)parameters;
 
     for (const struct uboot_name_value *var = working_uboot_env.vars; var; var = var->next) {
-        fprintf(stderr, "%s=%s", var->name, var->value);
+        fprintf(stderr, "%s=%s\n", var->name, var->value);
     }
 
     return NULL;
