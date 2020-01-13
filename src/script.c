@@ -652,6 +652,12 @@ static const struct term *function_reboot(const struct term *parameters)
     reboot(LINUX_REBOOT_CMD_RESTART);
     exit(EXIT_FAILURE);
 }
+static const struct term *function_poweroff(const struct term *parameters)
+{
+    (void)parameters;
+    reboot(LINUX_REBOOT_CMD_POWER_OFF);
+    exit(EXIT_FAILURE);
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -673,6 +679,7 @@ static struct function_info function_table[] = {
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
     {"fwup_revert", 0, function_fwup_revert, "revert to the previous firmware image"},
     {"reboot", 0, function_reboot, "reset the device"},
+    {"poweroff", 0, function_poweroff, "power off the device"},
     {NULL, 0, NULL, NULL}
 };
 
