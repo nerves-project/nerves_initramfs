@@ -36,8 +36,16 @@ const struct term *parser_result;
 // Once terms are in statements and blocks, force them const to avoid mistakes
 %type <const_term> Statements Statement ActionBlock
 
+%left ARROW
+%left ';'
+%left ','
+%right '='
+%left OR
+%left AND
+%left NEQ EQ
+%left LT LTE GTE GT
 %left '-' '+'
-%nonassoc UMINUS
+%precedence NOT
 
 %%
 
@@ -57,7 +65,7 @@ Rule:
 
 ActionBlock:
   Action { $$ = $1; }
-  | '{' Actions '}' { $$ = $2; }
+  | '{' Actions '}' { $$ = term_reverse($2); }
   ;
 
 Actions:
@@ -111,7 +119,7 @@ Parameters:
 term:
   term '+' term { $1->next = $3; $$ = term_new_fun("+", $1); }
   | term '-' term { $1->next = $3; $$ = term_new_fun("-", $1); }
-  | '-' term %prec UMINUS { $$ = term_new_number(-term_to_number($2)); }
+  | '-' term { $$ = term_new_number(-term_to_number($2)); }
   | '(' term ')' { $$ = $2; }
   | IDENTIFIER
   | STRING

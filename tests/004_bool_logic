@@ -17,6 +17,26 @@ true == true && false -> info("Should not print")
 "0" -> info("'0' is not true so this shouldn't print")
 "true" -> info("'true' is true")
 "false" -> info("'false' is not true so this shouldn't print")
+
+my_true=1
+my_false=0
+
+my_true && my_false -> info("true && false == false")
+my_true && my_true -> info("true && true == true")
+!my_true && my_true -> info("!true && true == false")
+!my_true && my_false -> info("!true && false == false")
+my_true && !my_false -> info("true && !false == true")
+!my_false && my_true -> info("!false && true == true")
+!my_false && my_false -> info("!false && false == false")
+
+my_true || my_false -> info("true || false == true")
+my_true || my_true -> info("true || true == true")
+!my_true || my_true -> info("!true || true == true")
+!my_true || my_false -> info("!true || false == false")
+my_true || !my_false -> info("true || !false == true")
+!my_false || my_true -> info("!false || true == true")
+!my_false || my_false -> info("!false || false == true")
+
 EOF
 
 
@@ -30,6 +50,15 @@ fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 1 is true
 '1' is true
 'true' is true
+true && true == true
+true && !false == true
+!false && true == true
+true || false == true
+true || true == true
+!true || true == true
+true || !false == true
+!false || true == true
+!false || false == true
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
