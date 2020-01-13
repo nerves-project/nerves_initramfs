@@ -277,8 +277,13 @@ bool term_to_boolean(const struct term *rv)
     rv = term_resolve(rv);
     switch (rv->kind) {
     case term_string:
-        // empty strings and "false" are false. Everything else is true.
-        return strlen(rv->string) > 0 && strcasecmp(rv->string, "false") != 0;
+        // empty strings, "0", and "false" are false. Everything else is true.
+        if (strlen(rv->string) == 0 ||
+            strcasecmp(rv->string, "0") == 0 ||
+            strcasecmp(rv->string, "false") == 0)
+            return false;
+        else
+            return true;
     case term_number:
         return rv->number != 0;
     case term_boolean:

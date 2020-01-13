@@ -9,7 +9,14 @@ true && true || false || false && false -> info("&& and || logic works")
 true && (true || (false || false)) && false -> info("Should not print")
 
 true == true && false -> info("Should not print")
-(true == false) || false -> info("Paren precedence takes over logical operators: shouldn't print")
+(true == false) || false -> info("Parentheses precedence takes over logical operators: shouldn't print")
+
+1 -> info("1 is true")
+"1" -> info("'1' is true")
+0 -> info("0 is not true so this shouldn't print")
+"0" -> info("'0' is not true so this shouldn't print")
+"true" -> info("'true' is true")
+"false" -> info("'false' is not true so this shouldn't print")
 EOF
 
 
@@ -20,6 +27,9 @@ fixture: mkdir("/sys", 777)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 && and || logic works
+1 is true
+'1' is true
+'true' is true
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
