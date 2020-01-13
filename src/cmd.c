@@ -35,13 +35,32 @@ int system_cmd(char * const *argv, char *output_buffer, int length)
         // parent
         close(pipefd[1]); // No writes to the pipe
 
-        length--; // Save room for a '\0'
+        if (length > 0) {
+            memset(output_buffer, 0, length);
+            length--; // Save room for a final '\0'
+        }
+
         int index = 0;
-        int amt;
-        while (index != length &&
-               (amt = read(pipefd[0], &output_buffer[index], length - index)) > 0)
-            index += amt;
-        output_buffer[index] = '\0';
+        for (;;) {
+            char throwaway[256];
+
+            char *p;
+            int amount_to_read = length - index;
+            if (amount_to_read > 0) {
+                p = &output_buffer[index];
+            } else {
+                p = throwaway;
+                amount_to_read = sizeof(throwaway);
+            }
+
+            int amount_read = read(pipefd[0], p, amount_to_read);
+            if (amount_read <= 0)
+                break;
+
+            if (p != throwaway)
+                index += amount_read;
+        }
+
         close(pipefd[0]);
 
         int status;
