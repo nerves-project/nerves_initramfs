@@ -13,6 +13,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <linux/reboot.h>
+#include <sys/reboot.h>
+
 #define HEAP_SIZE 16536
 
 static char *heap = NULL;
@@ -643,6 +646,12 @@ static const struct term *function_ls(const struct term *parameters)
     }
     return NULL;
 }
+static const struct term *function_reboot(const struct term *parameters)
+{
+    (void)parameters;
+    reboot(LINUX_REBOOT_CMD_RESTART);
+    exit(EXIT_FAILURE);
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -663,6 +672,7 @@ static struct function_info function_table[] = {
     {"getenv", 1, function_getenv, "get the value of a U-Boot variable"},
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
     {"fwup_revert", 0, function_fwup_revert, "revert to the previous firmware image"},
+    {"reboot", 0, function_reboot, "reset the device"},
     {NULL, 0, NULL, NULL}
 };
 

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+#
+# Test that reboot works
+#
+
+cat >"$CONFIG" <<EOF
+reboot()
+info("Does not print")
+EOF
+
+cat >"$EXPECTED" <<EOF
+fixture: mkdir("/mnt", 777)
+fixture: mkdir("/dev", 777)
+fixture: mkdir("/sys", 777)
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: reboot(0x01234567)
+EOF
+

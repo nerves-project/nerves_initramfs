@@ -100,6 +100,7 @@ getenv(key)        | Get the value of a U-Boot variable
 loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
 saveenv()          | Save all U-Boot variables back to storage
 setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
+reboot()           | Reset the device
 vars()             | Print out all known variables and their values
 
 ### Block device specifications
