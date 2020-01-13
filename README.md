@@ -102,6 +102,7 @@ saveenv()          | Save all U-Boot variables back to storage
 setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
 reboot()           | Reset the device
 poweroff()         | Power off the device
+sleep(milliseconds) | Wait for the specified time
 vars()             | Print out all known variables and their values
 
 ### Block device specifications

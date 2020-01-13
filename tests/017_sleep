@@ -1,0 +1,28 @@
+#!/bin/sh
+
+#
+# Test that sleep(milliseconds) works
+#
+
+cat >"$CONFIG" <<EOF
+sleep(1000)
+EOF
+
+cat >"$EXPECTED" <<EOF
+fixture: mkdir("/mnt", 777)
+fixture: mkdir("/dev", 777)
+fixture: mkdir("/sys", 777)
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: usleep(1000000)
+fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
+fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
+fixture: umount("/sys")
+fixture: unlink("/init")
+fixture: unlink("/nerves_initramfs.cfg")
+fixture: rmdir("/root")
+fixture: rmdir("/sys")
+fixture: mount(".", "/", "(null)", 8192, data)
+fixture: chroot(.)
+Hello from the chained /sbin/init
+EOF

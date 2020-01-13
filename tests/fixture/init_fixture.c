@@ -530,3 +530,9 @@ OVERRIDE(int, glob, (const char *pattern, int flags, int (*errfunc)(const char *
         return ORIGINAL(glob)(pattern, flags, errfunc, pglob);
     }
 }
+
+REPLACE(int, usleep, (useconds_t usec))
+{
+    log("usleep(%d)", usec);
+    return 0;
+}

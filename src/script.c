@@ -663,6 +663,12 @@ static const struct term *function_poweroff(const struct term *parameters)
     reboot(LINUX_REBOOT_CMD_POWER_OFF);
     exit(EXIT_FAILURE);
 }
+static const struct term *function_sleep(const struct term *parameters)
+{
+    int milliseconds = term_to_number(parameters);
+    usleep(milliseconds * 1000);
+    return NULL;
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -685,6 +691,7 @@ static struct function_info function_table[] = {
     {"fwup_revert", 0, function_fwup_revert, "revert to the previous firmware image"},
     {"reboot", 0, function_reboot, "reset the device"},
     {"poweroff", 0, function_poweroff, "power off the device"},
+    {"sleep", 0, function_sleep, "sleep for n milliseconds"},
     {NULL, 0, NULL, NULL}
 };
 
