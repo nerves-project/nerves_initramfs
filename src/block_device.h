@@ -3,11 +3,17 @@
 
 #define BLOCK_DEVICE_PATH_LEN 32
 
+enum block_device_type {
+    BLOCK_DEVICE_DISK = 0,
+    BLOCK_DEVICE_PARTITION
+};
+
 struct block_device_info
 {
     struct block_device_info *next;
+    enum block_device_type type;
     char path[BLOCK_DEVICE_PATH_LEN];
-    char partuuid[48];
+    char uuid[48];
 };
 
 int probe_block_devices(struct block_device_info **devices);

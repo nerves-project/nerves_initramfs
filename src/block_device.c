@@ -80,6 +80,14 @@ static int probe_gpt_devices(int fd, const char *devname, struct block_device_in
         block[7] != 'T')
         return -1;
 
+    // Add the disk
+    struct block_device_info *blkdev = alloc_blkdev();
+    blkdev->next = *devices;
+    blkdev->type = BLOCK_DEVICE_DISK;
+    snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s", devname);
+    uuid_to_string_me(&block[56], blkdev->uuid);
+    *devices = blkdev;
+
     // Load the partition table
     uint32_t partition_count = from_le32(&block[80]);
     if (partition_count > 256)
@@ -105,8 +113,9 @@ static int probe_gpt_devices(int fd, const char *devname, struct block_device_in
         if (!is_zeros(partition, 16)) {
             struct block_device_info *blkdev = alloc_blkdev();
             blkdev->next = *devices;
+            blkdev->type = BLOCK_DEVICE_PARTITION;
             snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i);
-            uuid_to_string_me(&partition[16], blkdev->partuuid);
+            uuid_to_string_me(&partition[16], blkdev->uuid);
             *devices = blkdev;
         }
     }
@@ -134,6 +143,14 @@ static int probe_mbr_devices(int fd, const char *devname, struct block_device_in
     // Capture the disk UUID since MBR partitions don't have UUIDs
     uint32_t disk_uuid = from_le32(&mbr[440]);
 
+    // Add the disk
+    struct block_device_info *blkdev = alloc_blkdev();
+    blkdev->next = *devices;
+    blkdev->type = BLOCK_DEVICE_DISK;
+    snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s", devname);
+    snprintf(blkdev->uuid, sizeof(blkdev->uuid), "%08x", disk_uuid);
+    *devices = blkdev;
+
     // Enumerate the primary partitions
     const char *p = p_or_np(devname);
     const uint8_t *partition = &mbr[446 + 4*16];
@@ -143,8 +160,9 @@ static int probe_mbr_devices(int fd, const char *devname, struct block_device_in
         if (partition[4] != 0) {
             struct block_device_info *blkdev = alloc_blkdev();
             blkdev->next = *devices;
+            blkdev->type = BLOCK_DEVICE_PARTITION;
             snprintf(blkdev->path, sizeof(blkdev->path), "/dev/%.16s%s%d", devname, p, i);
-            snprintf(blkdev->partuuid, sizeof(blkdev->partuuid), "%08x-%02x", disk_uuid, i);
+            snprintf(blkdev->uuid, sizeof(blkdev->uuid), "%08x-%02x", disk_uuid, i);
             *devices = blkdev;
         }
     }
@@ -210,7 +228,7 @@ void free_block_devices(struct block_device_info *devices)
     }
 }
 
-static int find_block_device_by_partuuid(const char *uuid, char *path)
+static int find_block_device_by_uuid(enum block_device_type type, const char *uuid, char *path)
 {
     struct block_device_info *devices;
     if (probe_block_devices(&devices) < 0)
@@ -218,7 +236,7 @@ static int find_block_device_by_partuuid(const char *uuid, char *path)
 
     int rc = -1;
     for (struct block_device_info *device = devices; device; device = device->next) {
-        if (strcmp(uuid, device->partuuid) == 0) {
+        if (type == device->type && strcmp(uuid, device->uuid) == 0) {
             strcpy(path, device->path);
             rc = 0;
             break;
@@ -231,8 +249,9 @@ static int find_block_device_by_partuuid(const char *uuid, char *path)
 int find_block_device_by_spec(const char *spec, char *path)
 {
     if (strncmp("PARTUUID=", spec, 9) == 0) {
-        // Handle partition UUID
-        return find_block_device_by_partuuid(&spec[9], path);
+        return find_block_device_by_uuid(BLOCK_DEVICE_PARTITION, &spec[9], path);
+    } else if (strncmp("DISKUUID=", spec, 9) == 0) {
+        return find_block_device_by_uuid(BLOCK_DEVICE_DISK, &spec[9], path);
     } else {
         // Assume path
         strcpy(path, spec);

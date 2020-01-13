@@ -567,7 +567,10 @@ static const struct term *function_blkid(const struct term *parameters)
     probe_block_devices(&devices);
 
     for (struct block_device_info *device = devices; device; device = device->next) {
-        fprintf(stderr, "%s: PARTUUID=\"%s\"\n", device->path, device->partuuid);
+        fprintf(stderr, "%s: %sUUID=\"%s\"\n",
+            device->path,
+            device->type == BLOCK_DEVICE_DISK ? "DISK" : "PART",
+            device->uuid);
     }
 
     free_block_devices(devices);
