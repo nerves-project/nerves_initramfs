@@ -597,6 +597,28 @@ static const struct term *function_cmd(const struct term *parameters)
 
     return term_new_string(output_buffer);
 }
+static const struct term *function_fwup_revert(const struct term *parameters)
+{
+    (void)parameters;
+
+    const char *devpathspec = get_variable_as_string("uboot_env.path");
+    char devpath[BLOCK_DEVICE_PATH_LEN];
+    if (find_block_device_by_spec(devpathspec, devpath) < 0) {
+        info("");
+        return term_new_boolean(false);
+    }
+
+    char *const argv[7] = {"/usr/bin/fwup", "revert.fw", "-d", devpath, "-t", "revert", 0};
+
+    char output_buffer[256];
+    output_buffer[0] = '\0';
+    if (system_cmd(argv, output_buffer, sizeof(output_buffer)) != 0) {
+        info("Failure from fwup revert: %s", output_buffer);
+        return term_new_boolean(false);
+    }
+
+    return term_new_boolean(true);
+}
 static const struct term *function_ls(const struct term *parameters)
 {
     const char *path = parameters ? term_to_string(parameters)->string : "/";
@@ -637,6 +659,7 @@ static struct function_info function_table[] = {
     {"setenv", 2, function_setenv, "set a U-Boot variable. It is not saved until you call saveenv/0"},
     {"getenv", 1, function_getenv, "get the value of a U-Boot variable"},
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
+    {"fwup_revert", 0, function_fwup_revert, "revert to the previous firmware image"},
     {NULL, 0, NULL, NULL}
 };
 

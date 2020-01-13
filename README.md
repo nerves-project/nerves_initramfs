@@ -90,6 +90,8 @@ Function           | Description
 blkid()            | Print out information about all block devices
 cmd()              | Run an external program. The first argument is the path to
                    | the program, the next is the first argument, and so on.
+fwup_revert()      | Run fwup with the appropriate parameters to revert to the
+                   | previous firmware.
 help()             | Print out help when running in the REPL
 info(...)          | Prints any arguments passed to it
 ls()               | List files a directory
