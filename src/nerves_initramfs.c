@@ -110,13 +110,51 @@ static int dm_create(off_t rootfs_size, const char *cipher, const char *secret)
     return 0;
 }
 
+static const char *root_skip_list[] = {".", "..", "dev", "mnt", "proc", "sys", NULL};
+static const char *nonroot_skip_list[] = {".", "..", NULL};
+
+static bool in_skip_list(const char *what, const char **list)
+{
+    while (*list) {
+        if (strcmp(*list, what) == 0)
+            return true;
+        list++;
+    }
+    return false;
+}
+
+void cleanup_dir(int dirfd, const char **skip_list)
+{
+    DIR *dir = fdopendir(dirfd);
+    for (struct dirent *dt = readdir(dir); dt != NULL; dt = readdir(dir)) {
+        // Skip . and ..
+        const char *name = dt->d_name;
+        if (in_skip_list(name, skip_list))
+            continue;
+
+        if (dt->d_type & DT_DIR) {
+            int fd = openat(dirfd, name, O_RDONLY);
+            if (fd >= 0) {
+                cleanup_dir(fd, nonroot_skip_list);
+            } else {
+                info("openat %s failed", name);
+            }
+            OK_OR_WARN(unlinkat(dirfd, name, AT_REMOVEDIR), "unlinkat directory  %s", name);
+        } else {
+            OK_OR_WARN(unlinkat(dirfd, name, 0), "unlinkat %s", name);
+        }
+    }
+
+    closedir(dir);
+}
+
 static void cleanup_old_rootfs()
 {
-    // This should erase all files and not just the ones we know of
-    (void) unlink("/init");
-    (void) unlink("/nerves_initramfs.cfg");
-    (void) rmdir("/root");
-    (void) rmdir("/sys");
+    int fd = open("/", O_RDONLY);
+    cleanup_dir(fd, root_skip_list);
+
+    rmdir("/sys");
+    rmdir("/proc");
 }
 
 static void switch_root()
@@ -126,8 +164,9 @@ static void switch_root()
     // Move /dev to its new home
     OK_OR_WARN(mount("/dev", "/mnt/dev", NULL, MS_MOVE, NULL), "moving /dev failed");
 
-    // Unmount /sys so that the next init can mount it
+    // Unmount /sys and /proc so that the next init can mount them
     OK_OR_WARN(umount("/sys"), "unmounting /sys failed");
+    OK_OR_WARN(umount("/proc"), "unmounting /proc failed");
 
     // Clean up the "old" rootfs.
     cleanup_old_rootfs();
@@ -142,50 +181,20 @@ static void switch_root()
     OK_OR_DEBUG(chroot("."), "chroot failed");
 }
 
-#ifdef DEBUG
-void dump_files(const char *path)
-{
-    struct dirent **namelist;
-    int n = scandir(path,
-                    &namelist,
-                    NULL,
-                    NULL);
-    int i;
-    for (i = 0; i < n; i++) {
-        if (namelist[i]->d_name[0] == '.')
-            continue;
-
-        char devpath[1024];
-        snprintf(devpath, sizeof(devpath), "%s/%s", path, namelist[i]->d_name);
-        info("%s",  devpath);
-
-        // Block device?
-        struct stat sb;
-        if (stat(devpath, &sb) == 0 &&
-            S_ISDIR(sb.st_mode))
-            dump_files(devpath);
-
-    }
-
-    if (n >= 0) {
-        for (i = 0; i < n; i++)
-            free(namelist[i]);
-        free(namelist);
-    }
-}
-#endif
-
 static void setup_initramfs()
 {
     // Create necessary directories in case they're not around.
-    (void) mkdir("/mnt", 0777);
-    (void) mkdir("/dev", 0777);
-    (void) mkdir("/sys", 0777);
+    (void) mkdir("/mnt", 0755);
+    (void) mkdir("/dev", 0755);
+    (void) mkdir("/sys", 0555);
+    (void) mkdir("/proc", 0555);
 
     // devtmpfs must be enabled in the kernel. It must be manually mounted for the initramfs.
-    OK_OR_WARN(mount("devtmpfs", "/dev", "devtmpfs", MS_NOEXEC | MS_NOSUID, "mode=755,size=5%"), "Cannot mount /dev");
+    OK_OR_WARN(mount("devtmpfs", "/dev", "devtmpfs", MS_NOSUID | MS_NOEXEC, "mode=755,size=5%"), "Can't mount /dev");
 
-    OK_OR_WARN(mount("sysfs", "/sys", "sysfs", MS_NOEXEC | MS_NOSUID | MS_NODEV, NULL), "Cannot mount /sys");
+    // Mount /sys and /proc since so many things depend on them
+    OK_OR_WARN(mount("sysfs", "/sys", "sysfs", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL), "Can't mount /sys");
+    OK_OR_WARN(mount("proc", "/proc", "proc", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL), "Can't mount /proc");
 }
 
 static void mount_fs(const char *rootfs, const char *rootfs_type)
