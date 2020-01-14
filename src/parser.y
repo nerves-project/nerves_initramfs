@@ -45,7 +45,7 @@ const struct term *parser_result;
 %left NEQ EQ
 %left LT LTE GTE GT
 %left '-' '+'
-%precedence NOT
+%right NOT
 
 %%
 
