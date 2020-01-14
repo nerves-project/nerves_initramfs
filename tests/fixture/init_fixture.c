@@ -1,5 +1,6 @@
 #define _GNU_SOURCE // for RTLD_NEXT
 #include <stdio.h>
+#include <stdbool.h>
 #include <dlfcn.h>
 #include <limits.h>
 #include <unistd.h>
@@ -47,6 +48,7 @@
 
 static pid_t starting_pid = 1;
 static const char *work = NULL;
+static bool remounted_root = false;
 
 __attribute__((constructor)) void fixture_init()
 {
@@ -69,17 +71,21 @@ static int fixup_path(const char *input, char *output)
         errx(EXIT_FAILURE, "Non-absolute path detected: \"%s\"", input);
 
     // Prepend the working directory to the path
-    sprintf(output, "%s%s", work, input);
+    sprintf(output, "%s%s%s", work, remounted_root ? "/mnt" : "", input);
+
     return 0;
 }
 
 static void unfixup_path(char *path)
 {
-    size_t work_len = strlen(work);
+    char prefix[PATH_MAX];
+    sprintf(prefix, "%s%s", work, remounted_root ? "/mnt" : "");
+
+    size_t prefix_len = strlen(prefix);
     size_t path_len = strlen(path);
 
-    if (path_len >= work_len && memcmp(path, work, work_len) == 0)
-        memmove(path, path + work_len, path_len - work_len + 1);
+    if (path_len >= prefix_len && memcmp(path, prefix, prefix_len) == 0)
+        memmove(path, path + prefix_len, path_len - prefix_len + 1);
 }
 
 #ifdef __APPLE__
@@ -90,6 +96,10 @@ REPLACE(int, mount, (const char *type, const char *dir, int flags, void *data))
     const char *filesystemtype = data;
 
     log("mount(\"%s\", \"%s\", \"%s\", %d, data)", type, dir, filesystemtype, flags);
+
+    if (strcmp(type, ".") == 0 && strcmp(dir, "/") == 0)
+        remounted_root = true;
+
     return 0;
 }
 
@@ -108,6 +118,10 @@ REPLACE(int, mount, (const char *source, const char *target,
     (void) data;
 
     log("mount(\"%s\", \"%s\", \"%s\", %lu, data)", source, target, filesystemtype, mountflags);
+
+    if (strcmp(source, ".") == 0 && strcmp(target, "/") == 0)
+        remounted_root = true;
+
     return 0;
 }
 
