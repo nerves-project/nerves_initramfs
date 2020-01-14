@@ -9,11 +9,13 @@ blkid()
 EOF
 
 cat >"$EXPECTED" <<EOF
-fixture: mkdir("/mnt", 777)
-fixture: mkdir("/dev", 777)
-fixture: mkdir("/sys", 777)
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
 /dev/mmcblk0p1: PARTUUID="5278721d-0089-4768-85df-b8f1b97e6684"
 /dev/mmcblk0p2: PARTUUID="fcc205c8-2f1c-4dcd-bef4-7b209aa15cca"
 /dev/mmcblk0p5: PARTUUID="7e7b6f06-8aaf-42c6-9c3b-6ede014885a6"
@@ -24,10 +26,11 @@ fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
-fixture: unlink("/init")
-fixture: unlink("/nerves_initramfs.cfg")
-fixture: rmdir("/root")
+fixture: umount("/proc")
+fixture: unlinkat("bin", AT_REMOVEDIR)
+fixture: unlinkat("usr", AT_REMOVEDIR)
 fixture: rmdir("/sys")
+fixture: rmdir("/proc")
 fixture: mount(".", "/", "(null)", 8192, data)
 fixture: chroot(.)
 Hello from the chained /sbin/init

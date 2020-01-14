@@ -10,11 +10,13 @@ info("Does not print")
 EOF
 
 cat >"$EXPECTED" <<EOF
-fixture: mkdir("/mnt", 777)
-fixture: mkdir("/dev", 777)
-fixture: mkdir("/sys", 777)
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
 fixture: reboot(0x4321fedc)
 EOF
 

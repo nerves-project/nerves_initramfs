@@ -7,7 +7,7 @@
 # To recreate the input environment, run:
 #
 # printf "newvar=hello\nvar1=2000\nvar2=2\nvar3=4000\nvar4=4" | mkenvimage -s "131072" - | gzip -c | base64
-base64_decodez >"$WORK/dev/sdb" <<EOF
+base64_decodez >"$TEST_ROOTFS/dev/sdb" <<EOF
 H4sIAAAAAAAAA+3IsQ2DMBRFUc9CQ2uM2z8MhSUKK5FSJFtlwyhgiSnQOc27etPvOz/a5729Ym+9
 P9NZS5Sc86gSZcwa9Tpq1JT+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -17,7 +17,7 @@ EOF
 # To recreate the expected resulting environment, run:
 #
 # printf "anothervar=world\nnewvar=hello\nvar1=5\nvar2=2\nvar3=4000\nvar4=4" | mkenvimage -s "131072" - | gzip -c | base64
-base64_decodez >"$WORK/dev/expected_sdb" <<EOF
+base64_decodez >"$WORK/expected_sdb" <<EOF
 H4sIAAAAAAAAA+3HwQkCMRRF0TQkxDEufzEDBmYRJhDE2diBjdilmjbknM197/R8vde937c6HuuI
 o492S3s95tlqaz391jmuM0ssM5coOee5SpSUPgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -25,7 +25,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMCf+ALz9rjPAAACAA==
 EOF
 
 cat >"$POST_TEST_CHECK" <<EOF
-cmp $WORK/dev/expected_sdb $WORK/dev/sdb
+cmp $WORK/expected_sdb $TEST_ROOTFS/dev/sdb
 EOF
 
 cat >"$CONFIG" <<EOF
@@ -49,11 +49,13 @@ saveenv()
 EOF
 
 cat >"$EXPECTED" <<EOF
-fixture: mkdir("/mnt", 777)
-fixture: mkdir("/dev", 777)
-fixture: mkdir("/sys", 777)
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
 var4=4
 var3=4000
 var2=2
@@ -63,10 +65,11 @@ Found newvar
 fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
-fixture: unlink("/init")
-fixture: unlink("/nerves_initramfs.cfg")
-fixture: rmdir("/root")
+fixture: umount("/proc")
+fixture: unlinkat("bin", AT_REMOVEDIR)
+fixture: unlinkat("usr", AT_REMOVEDIR)
 fixture: rmdir("/sys")
+fixture: rmdir("/proc")
 fixture: mount(".", "/", "(null)", 8192, data)
 fixture: chroot(.)
 Hello from the chained /sbin/init

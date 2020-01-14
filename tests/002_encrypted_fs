@@ -11,11 +11,13 @@ rootfs.encrypted = true
 EOF
 
 cat >"$EXPECTED" <<EOF
-fixture: mkdir("/mnt", 777)
-fixture: mkdir("/dev", 777)
-fixture: mkdir("/sys", 777)
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
 fixture: ioctl(LOOP_SET_FD)
 fixture: ioctl(DM_DEV_CREATE, data_size=16384, data_start=312, target_count=0, open_count=0, flags=0, event_nr=0, dev=0x0, name=rootfs, uuid=CRYPT-PLAIN-rootfs
 fixture: ioctl(DM_TABLE_LOAD, data_size=16384, data_start=312, target_count=1, open_count=0, flags=32768, event_nr=0, dev=0x0, name=rootfs, uuid=, target=0,524288,crypt (aes-cbc-plain 8e9c0780fd7f5d00c18a30812fe960cfce71f6074dd9cded6aab2897568cc856 0 /dev/loop0 0)
@@ -23,10 +25,11 @@ fixture: ioctl(DM_DEV_SUSPEND, data_size=16384, data_start=312, target_count=0, 
 fixture: mount("/dev/dm-0", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
-fixture: unlink("/init")
-fixture: unlink("/nerves_initramfs.cfg")
-fixture: rmdir("/root")
+fixture: umount("/proc")
+fixture: unlinkat("bin", AT_REMOVEDIR)
+fixture: unlinkat("usr", AT_REMOVEDIR)
 fixture: rmdir("/sys")
+fixture: rmdir("/proc")
 fixture: mount(".", "/", "(null)", 8192, data)
 fixture: chroot(.)
 Hello from the chained /sbin/init

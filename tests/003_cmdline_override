@@ -9,18 +9,21 @@ cat >$CMDLINE_FILE <<EOF
 EOF
 
 cat >"$EXPECTED" <<EOF
-fixture: mkdir("/mnt", 777)
-fixture: mkdir("/dev", 777)
-fixture: mkdir("/sys", 777)
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
 fixture: mount("/dev/mmcblk0p2", "/mnt", "myfstype", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
 fixture: umount("/sys")
-fixture: unlink("/init")
-fixture: unlink("/nerves_initramfs.cfg")
-fixture: rmdir("/root")
+fixture: umount("/proc")
+fixture: unlinkat("bin", AT_REMOVEDIR)
+fixture: unlinkat("usr", AT_REMOVEDIR)
 fixture: rmdir("/sys")
+fixture: rmdir("/proc")
 fixture: mount(".", "/", "(null)", 8192, data)
 fixture: chroot(.)
 Hello from the chained /sbin/init
