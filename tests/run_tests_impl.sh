@@ -15,6 +15,7 @@ readlink_f () {
 TESTS_DIR=$(dirname $(readlink_f $0))
 
 WORK=$TESTS_DIR/work
+TEST_ROOTFS=$TESTS_DIR/work/rootfs
 RESULTS=$WORK/results
 
 INIT=$TESTS_DIR/../src/init
@@ -55,7 +56,7 @@ base64_decodez() {
 
 run() {
     TEST=$1
-    CONFIG=$WORK/nerves_initramfs.conf
+    CONFIG=$TEST_ROOTFS/nerves_initramfs.conf
     POST_TEST_CHECK=$WORK/post-test.sh
     CMDLINE_FILE=$WORK/$TEST.cmdline
     EXPECTED=$WORK/$TEST.expected
@@ -64,6 +65,7 @@ run() {
 
     # Setup a fake root directory to simulate init boot
     rm -fr "$WORK"
+    mkdir -p "$TEST_ROOTFS"
     source "$TESTS_DIR/init_fixture.sh"
 
     # Run the test script to setup files for the test
@@ -78,7 +80,7 @@ run() {
     # Run init
     # NOTE: Call 'exec' so that it's possible to set argv0, but that means we
     #       need a subshell - hence the parentheses.
-    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$WORK exec -a /init $INIT $CMDLINE) 2> $RESULTS.raw
+    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$TEST_ROOTFS exec -a /init $INIT $CMDLINE) 2> $RESULTS.raw
 
     # Trim the results of known lines that vary between runs
     # The calls to sed fixup differences between getopt implementations.

@@ -15,6 +15,7 @@ readlink_f () {
 TESTS_DIR=$(dirname $(readlink_f "$0"))
 
 WORK=$TESTS_DIR/work
+TEST_ROOTFS="$WORK/rootfs"
 
 INIT=$TESTS_DIR/../src/init
 FIXTURE=$TESTS_DIR/fixture/init_fixture.so
@@ -23,10 +24,11 @@ if [ ! -f "$INIT" ]; then echo "Build $INIT first"; exit 1; fi
 if [ ! -f "$FIXTURE" ]; then echo "Build $FIXTURE first"; exit 1; fi
 
 run() {
-    CONFIG=$WORK/nerves_initramfs.conf
+    CONFIG=$TEST_ROOTFS/nerves_initramfs.conf
 
     # Setup a fake root directory to simulate init boot
     rm -fr "$WORK"
+    mkdir -p "$TEST_ROOTFS"
     source "$TESTS_DIR/init_fixture.sh"
 
     # Run the test script to setup files for the test
@@ -37,7 +39,7 @@ EOF
     # Run init
     # NOTE: Call 'exec' so that it's possible to set argv0, but that means we
     #       need a subshell - hence the parentheses.
-    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$WORK exec -a /init "$INIT")
+    (LD_PRELOAD=$FIXTURE DYLD_INSERT_LIBRARIES=$FIXTURE WORK=$TEST_ROOTFS exec -a /init "$INIT")
 }
 
 run
