@@ -11,15 +11,13 @@ OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o scrip
 ifeq ($(shell uname),Darwin)
 CFLAGS += -Icompat
 OBJS += compat/compat.o
-else
-BISONFLAGS += -Wno-conflicts-sr
 endif
 
 init: $(OBJS)
 	$(CC) $(CFLAGS)  -o $@ $^
 
 parser.tab.c parser.tab.h: parser.y
-	$(BISON) -d $(BISONFLAS) $<
+	$(BISON) -d $(BISONFLAGS) $<
 
 lex.yy.c: lexer.l parser.tab.h
 	$(FLEX) $<
