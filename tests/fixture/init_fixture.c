@@ -338,6 +338,18 @@ REPLACE(int, unlink, (const char *target))
     return 0;
 }
 
+OVERRIDE(int, unlinkat, (int fd, const char *path, int flag))
+{
+    if (flag == AT_REMOVEDIR) {
+        log("unlinkat(\"%s\", AT_REMOVEDIR)", path);
+    } else {
+        // File order is not deterministic
+    }
+
+    return ORIGINAL(unlinkat)(fd, path, flag);
+}
+
+
 #ifdef __APPLE__
 OVERRIDE(int, stat, (const char *pathname, struct stat *st))
 {
