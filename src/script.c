@@ -431,7 +431,7 @@ static const struct term *function_info(const struct term *parameters)
 {
     while (parameters) {
         const struct term *str = term_to_string(parameters);
-        fprintf(stderr, "%s ", str->string);
+        fprintf(stderr, "%s", str->string);
         parameters = parameters->next;
     }
     fprintf(stderr, "\n");
