@@ -228,6 +228,9 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 
 static void repl()
 {
+    // Reset the terminal colors
+    printf("\033[0m");
+
     extern const struct term *parser_result;
     char *line;
     while((line = linenoise("nerves_initramfs> ")) != NULL) {
