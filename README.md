@@ -43,7 +43,7 @@ setting variables. Rules are composed of a condition and a list of actions .
 Here's an example:
 
 ```config
-boot.a && a.valid -> { rootfs.path="/dev/mmcblk0p2"; boot(); }
+!fw_validated && fw_booted -> { fwup_revert(); reboot(); }
 ```
 
 Real configuration files contain rules to handle fallback logic or set up root
@@ -88,21 +88,19 @@ It's also possible to call built-in functions:
 Function           | Description
 -------------------|-------------
 blkid()            | Print out information about all block devices
-cmd()              | Run an external program. The first argument is the path to
-                   | the program, the next is the first argument, and so on.
-fwup_revert()      | Run fwup with the appropriate parameters to revert to the
-                   | previous firmware.
+cmd()              | Run an external program. The first argument is the path to the program, the next is the first argument, and so on.
+env()              | Print out all loaded U-Boot variables
+fwup_revert()      | Run fwup with the appropriate parameters to revert to the previous firmware.
+getenv(key)        | Get the value of a U-Boot variable
 help()             | Print out help when running in the REPL
 info(...)          | Prints any arguments passed to it
-ls()               | List files a directory
-env()              | Print out all loaded U-Boot variables
-getenv(key)        | Get the value of a U-Boot variable
 loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
+ls()               | List files a directory
+poweroff()         | Power off the device
+reboot()           | Reset the device
 saveenv()          | Save all U-Boot variables back to storage
 setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
-reboot()           | Reset the device
-poweroff()         | Power off the device
-sleep(milliseconds) | Wait for the specified time
+sleep(timeout)     | Wait for the specified milliseconds
 vars()             | Print out all known variables and their values
 
 ### Block device specifications
