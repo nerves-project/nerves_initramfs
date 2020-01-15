@@ -23,22 +23,6 @@
 // Global U-Boot environment data
 struct uboot_env working_uboot_env;
 
-// Files in /dev populate asynchronously so this lets us wait for them to show up.
-static int retry_open_block_device(const char *spec, int flags, char *path)
-{
-    int tries = 1000;
-    int fd = open_block_device(spec, flags, path);
-    while (fd < 0 && tries > 0) {
-        usleep(10);
-        fd = open_block_device(spec, flags, path);
-        tries--;
-    }
-
-    if (fd < 0)
-        fatal("Timed out waiting for '%s'", spec);
-
-    return fd;
-}
 static int losetup(int rootfs_fd)
 {
     // Assume loop0 is available since who else would be able to take it?
@@ -201,7 +185,9 @@ static void mount_fs(const char *rootfs, const char *rootfs_type)
 {
     // Wait for the rootfs to appear
     char rootfs_path[BLOCK_DEVICE_PATH_LEN];
-    int rootfs_fd = retry_open_block_device(rootfs, O_RDONLY, rootfs_path);
+    int rootfs_fd = open_block_device(rootfs, O_RDONLY, rootfs_path);
+    if (rootfs_fd < 0)
+        fatal("Can't continue since '%s' does not exist.", rootfs);
     close(rootfs_fd);
 
     OK_OR_FATAL(mount(rootfs_path, "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
@@ -211,7 +197,9 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 {
     // Wait for the rootfs to appear
     char rootfs_path[BLOCK_DEVICE_PATH_LEN];
-    int rootfs_fd = retry_open_block_device(rootfs, O_RDONLY, rootfs_path);
+    int rootfs_fd = open_block_device(rootfs, O_RDONLY, rootfs_path);
+    if (rootfs_fd < 0)
+        fatal("Can't continue since '%s' does not exist.", rootfs);
     off_t rootfs_size = lseek(rootfs_fd, 0, SEEK_END);
     (void) lseek(rootfs_fd, 0, SEEK_SET);
 

@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "util.h"
+
 static struct block_device_info *alloc_blkdev()
 {
     struct block_device_info *blkdev = malloc(sizeof(struct block_device_info));
@@ -259,10 +261,30 @@ int find_block_device_by_spec(const char *spec, char *path)
     }
 }
 
-int open_block_device(const char *spec, int flags, char *path)
+static int open_block_device_impl(const char *spec, int flags, char *path)
 {
     if (find_block_device_by_spec(spec, path) < 0)
         return -1;
 
     return open(path, flags);
+}
+
+// Files in /dev populate asynchronously so this lets us wait for them to show up.
+int open_block_device(const char *spec, int flags, char *path)
+{
+    // If this is called multiple times and we've exhausted the wait time, then
+    // don't wait any longer. We don't want a longer cumulative wait that depends on
+    // the contents of the script.
+    static int tries = 1000; // Wait 1000 * 1ms = 1 second total
+    int fd = open_block_device_impl(spec, flags, path);
+    while (fd < 0 && tries > 0) {
+        usleep(1000);
+        fd = open_block_device_impl(spec, flags, path);
+        tries--;
+    }
+
+    if (fd < 0)
+        info("Could not open block device '%s' even after waiting!", spec);
+
+    return fd;
 }
