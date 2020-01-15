@@ -34,14 +34,14 @@ if [ ! -f "$FIXTURE" ]; then echo "Build $FIXTURE first"; exit 1; fi
 # Host-specific options
 case $(uname -s) in
     Darwin)
-	    # Not -d?
+        # Not -d?
         BASE64_DECODE=-D
 
         SED=/usr/local/bin/gsed
         [ -e $SED ] || ( echo "Please run 'brew install gnu-sed' to install gsed"; exit 1 )
         ;;
     *)
-	    SED=sed
+        SED=sed
         BASE64_DECODE=-d
         ;;
 esac
