@@ -3,9 +3,11 @@
 #
 # Specify a GPT partition by UUID
 #
+# NOTE: Notice the random case in the UUID in the test.
+#
 
 cat >"$CONFIG" <<EOF
-rootfs.path="PARTUUID=7e7b6f06-8aaf-42c6-9c3b-6ede014885a6"
+rootfs.path="PARTUUID=7e7b6f06-8AAF-42c6-9c3b-6ede014885A6"
 EOF
 
 cat >"$EXPECTED" <<EOF

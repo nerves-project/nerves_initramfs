@@ -238,7 +238,8 @@ static int find_block_device_by_uuid(enum block_device_type type, const char *uu
 
     int rc = -1;
     for (struct block_device_info *device = devices; device; device = device->next) {
-        if (type == device->type && strcmp(uuid, device->uuid) == 0) {
+        // strcasecmp to avoid being picky on UUID hex digit capitalization
+        if (type == device->type && strcasecmp(uuid, device->uuid) == 0) {
             strcpy(path, device->path);
             rc = 0;
             break;
