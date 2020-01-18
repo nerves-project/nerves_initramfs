@@ -427,7 +427,7 @@ static const struct term *function_subtract(const struct term *parameters)
     return term_new_number(a - b);
 }
 
-static const struct term *function_info(const struct term *parameters)
+static const struct term *function_print(const struct term *parameters)
 {
     while (parameters) {
         const struct term *str = term_to_string(parameters);
@@ -683,10 +683,10 @@ static struct function_info function_table[] = {
     {"fwup_revert", 0, function_fwup_revert, "revert to the previous firmware image"},
     {"getenv", 1, function_getenv, "get the value of a U-Boot variable"},
     {"help", 0, function_help, "print out help in the REPL"},
-    {"info", 0, function_info, "print any arguments to it"},
     {"loadenv", 0, function_loadenv, "load a U-Boot environment block"},
     {"ls", 0, function_ls, "list files"},
     {"poweroff", 0, function_poweroff, "power off the device"},
+    {"print", 1, function_print, "print one or more strings and variables"},
     {"reboot", 0, function_reboot, "reset the device"},
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
     {"setenv", 2, function_setenv, "set a U-Boot variable. It is not saved until you call saveenv/0"},

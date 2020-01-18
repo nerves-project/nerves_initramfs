@@ -5,37 +5,37 @@
 #
 
 cat >"$CONFIG" <<EOF
-true && true || false || false && false -> info("&& and || logic works")
-true && (true || (false || false)) && false -> info("Should not print")
+true && true || false || false && false -> print("&& and || logic works")
+true && (true || (false || false)) && false -> print("Should not print")
 
-true == true && false -> info("Should not print")
-(true == false) || false -> info("Parentheses precedence takes over logical operators: shouldn't print")
+true == true && false -> print("Should not print")
+(true == false) || false -> print("Parentheses precedence takes over logical operators: shouldn't print")
 
-1 -> info("1 is true")
-"1" -> info("'1' is true")
-0 -> info("0 is not true so this shouldn't print")
-"0" -> info("'0' is not true so this shouldn't print")
-"true" -> info("'true' is true")
-"false" -> info("'false' is not true so this shouldn't print")
+1 -> print("1 is true")
+"1" -> print("'1' is true")
+0 -> print("0 is not true so this shouldn't print")
+"0" -> print("'0' is not true so this shouldn't print")
+"true" -> print("'true' is true")
+"false" -> print("'false' is not true so this shouldn't print")
 
 my_true=1
 my_false=0
 
-my_true && my_false -> info("true && false == false")
-my_true && my_true -> info("true && true == true")
-!my_true && my_true -> info("!true && true == false")
-!my_true && my_false -> info("!true && false == false")
-my_true && !my_false -> info("true && !false == true")
-!my_false && my_true -> info("!false && true == true")
-!my_false && my_false -> info("!false && false == false")
+my_true && my_false -> print("true && false == false")
+my_true && my_true -> print("true && true == true")
+!my_true && my_true -> print("!true && true == false")
+!my_true && my_false -> print("!true && false == false")
+my_true && !my_false -> print("true && !false == true")
+!my_false && my_true -> print("!false && true == true")
+!my_false && my_false -> print("!false && false == false")
 
-my_true || my_false -> info("true || false == true")
-my_true || my_true -> info("true || true == true")
-!my_true || my_true -> info("!true || true == true")
-!my_true || my_false -> info("!true || false == false")
-my_true || !my_false -> info("true || !false == true")
-!my_false || my_true -> info("!false || true == true")
-!my_false || my_false -> info("!false || false == true")
+my_true || my_false -> print("true || false == true")
+my_true || my_true -> print("true || true == true")
+!my_true || my_true -> print("!true || true == true")
+!my_true || my_false -> print("!true || false == false")
+my_true || !my_false -> print("true || !false == true")
+!my_false || my_true -> print("!false || true == true")
+!my_false || my_false -> print("!false || false == true")
 
 EOF
 

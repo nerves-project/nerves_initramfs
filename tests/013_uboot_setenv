@@ -42,7 +42,7 @@ setenv("var1", 5)
 setenv("anothervar", "world")
 
 # Test a variable
-getenv("newvar") == "hello" -> info("Found newvar")
+getenv("newvar") == "hello" -> print("Found newvar")
 
 # save things back
 saveenv()

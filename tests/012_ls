@@ -5,9 +5,9 @@
 #
 
 cat >"$CONFIG" <<EOF
-info("ls with no arguments")
+print("ls with no arguments")
 ls()
-info("ls /usr")
+print("ls /usr")
 ls("/usr")
 EOF
 
@@ -19,17 +19,17 @@ fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 fixture: mount("proc", "/proc", "proc", 14, data)
-ls with no arguments 
+ls with no arguments
 .                               <DIR>
 ..                              <DIR>
 dev                             <DIR>
-init                            
+init
 mnt                             <DIR>
-nerves_initramfs.conf           
+nerves_initramfs.conf
 proc                            <DIR>
 sys                             <DIR>
 usr                             <DIR>
-ls /usr 
+ls /usr
 .                               <DIR>
 ..                              <DIR>
 bin                             <DIR>

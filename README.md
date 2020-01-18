@@ -93,7 +93,7 @@ env()              | Print out all loaded U-Boot variables
 fwup_revert()      | Run fwup with the appropriate parameters to revert to the previous firmware.
 getenv(key)        | Get the value of a U-Boot variable
 help()             | Print out help when running in the REPL
-info(...)          | Prints any arguments passed to it
+print(...)         | Print one or more strings and variables
 loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
 ls()               | List files a directory
 poweroff()         | Power off the device

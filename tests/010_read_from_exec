@@ -6,7 +6,7 @@
 
 cat >"$CONFIG" <<EOF
 result = cmd("/usr/bin/boardid")
-info("Result is ", result)
+print("Result is ", result)
 EOF
 
 cat >"$EXPECTED" <<EOF
