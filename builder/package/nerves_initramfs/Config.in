@@ -5,3 +5,13 @@ config BR2_PACKAGE_NERVES_INITRAMFS
 	  An initramfs project for Nerves.
 
 	  https://github.com/fhunleth/nerves_initramfs
+
+if BR2_PACKAGE_NERVES_INITRAMFS
+
+config BR2_PACKAGE_NERVES_INITRAMFS_DEBUG
+        bool "nerves_initramfs debug"
+        help
+          Enable debug output
+
+endif
+
