@@ -85,7 +85,7 @@ run() {
     # Trim the results of known lines that vary between runs
     # The calls to sed fixup differences between getopt implementations.
     cat "$RESULTS.raw" | \
-        grep -v "Starting init" | \
+        grep -v "version" | \
         $SED -e "s/\`/'/g" \
         > "$RESULTS"
 

@@ -21,6 +21,14 @@
 
 #define PROGRAM_NAME "nerves_initramfs"
 
+#ifndef PROGRAM_VERSION
+#define PROGRAM_VERSION unknown
+#endif
+
+#define xstr(s) str(s)
+#define str(s) #s
+#define PROGRAM_VERSION_STR xstr(PROGRAM_VERSION)
+
 //#define DEBUG 1
 
 // Logging functions
