@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.1
+
+* New features
+  * Print out version on start
+  * Support debug builds. Debug initramfs cpio images can be concatenated onto
+    the ones in use to "turn on" debug prints.
+  * Rename info() to print() since that's what the function does
+
+* Bug fixes
+  * Fix bug where uboot environment reads would not wait for the target disk to
+    enumerate
+  * Fix issue where UUIDs were case sensitive on the hex digits
+
 ## v0.3.0
 
 * New features
