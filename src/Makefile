@@ -2,14 +2,13 @@ VERSION=0.3.0
 
 BISON ?= bison
 FLEX ?= flex
-
-CFLAGS += -Wall -Wextra
+CFLAGS ?= -Wall -Wextra
 
 # _GNU_SOURCE is for asprintf
-CFLAGS += -D_GNU_SOURCE
+EXTRA_CFLAGS = -D_GNU_SOURCE -DPROGRAM_VERSION=$(VERSION)
 
 ifneq ($(DEBUG),)
-CFLAGS += -DDEBUG
+EXTRA_CFLAGS += -DDEBUG
 endif
 
 CFLAGS += -DPROGRAM_VERSION=$(VERSION)
@@ -17,12 +16,15 @@ CFLAGS += -DPROGRAM_VERSION=$(VERSION)
 OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o block_device.o cmd.o
 
 ifeq ($(shell uname),Darwin)
-CFLAGS += -Icompat
+EXTRA_CFLAGS += -Icompat
 OBJS += compat/compat.o
 endif
 
 init: $(OBJS)
-	$(CC) $(CFLAGS)  -o $@ $^
+	$(CC) $(LDLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $(EXTRA_CFLAGS) -o $@ $^
 
 parser.tab.c parser.tab.h: parser.y
 	$(BISON) -d $(BISONFLAGS) $<
