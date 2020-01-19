@@ -8,6 +8,10 @@ CFLAGS += -Wall -Wextra
 # _GNU_SOURCE is for asprintf
 CFLAGS += -D_GNU_SOURCE
 
+ifneq ($(DEBUG),)
+CFLAGS += -DDEBUG
+endif
+
 CFLAGS += -DPROGRAM_VERSION=$(VERSION)
 
 OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o block_device.o cmd.o

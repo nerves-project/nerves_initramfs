@@ -255,6 +255,7 @@ static void initialize_script_defaults(int argc, char *argv[])
     // or
     //   --nerves_initramfs=key=value
     for (int i = 1; i < argc; i++) {
+        debug("argv[%d]='%s'", i, argv[i]);
         if (strncmp("--nerves_initramfs=", argv[i], 19) == 0) {
             char *key = argv[i] + 19;
             char *equals = strchr(key, '=');
@@ -272,7 +273,11 @@ static void initialize_script_defaults(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    info("version " PROGRAM_VERSION_STR);
+    info("version " PROGRAM_VERSION_STR
+#ifdef DEBUG
+         " [DEBUG]"
+#endif
+            );
 
     if (getpid() != 1)
        fatal("Must be pid 1");

@@ -49,7 +49,7 @@ void fatal(const char *fmt, ...);
 #define OK_OR_WARN(WORK, MSG, ...) do { if ((WORK) < 0) info(MSG, ## __VA_ARGS__); } while (0)
 
 #ifdef DEBUG
-#define debug warn
+#define debug info
 #define OK_OR_DEBUG(WORK, MSG, ...) do { if ((WORK) < 0) info(MSG, ## __VA_ARGS__); } while (0)
 #define assert(CONDITION) do { if (!(CONDITION)) fatal("assert failed at %s:%d", __FILE__, __LINE__); } while (0)
 #else
