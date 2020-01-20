@@ -111,7 +111,7 @@ jobs:
           command: echo "nerves_initramfs_debug_x86_64" > .target
       - restore_cache:
           key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
-       - run:
+      - run:
           name: Create release notes
           command: grep -Pazo "(?s)(?<=## ${CIRCLE_TAG})[^#]+" ~/deploy/CHANGELOG.md | sed '/./,$!d' > ~/deploy/RELEASE_NOTES
       - run:
