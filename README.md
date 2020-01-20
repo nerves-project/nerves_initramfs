@@ -97,9 +97,10 @@ print(...)         | Print one or more strings and variables
 loadenv()          | Load a U-Boot environment block. Set up `uboot_env.path`, `uboot_env.start` and `uboot_env.count` first.
 ls()               | List files a directory
 poweroff()         | Power off the device
+readfile(path)     | Read a file (truncates long files)
 reboot()           | Reset the device
 saveenv()          | Save all U-Boot variables back to storage
-setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()
+setenv(key, value) | Set a U-Boot variable. It is not saved until you call `saveenv()`
 sleep(timeout)     | Wait for the specified milliseconds
 vars()             | Print out all known variables and their values
 

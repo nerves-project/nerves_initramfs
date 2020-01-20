@@ -1,0 +1,34 @@
+#!/bin/sh
+
+#
+# Test that sleep(milliseconds) works
+#
+
+cat >"$CONFIG" <<EOF
+r=readfile("/nerves_initramfs.conf")
+print(r)
+EOF
+
+cat >"$EXPECTED" <<EOF
+fixture: mkdir("/mnt", 755)
+fixture: mkdir("/dev", 755)
+fixture: mkdir("/sys", 555)
+fixture: mkdir("/proc", 555)
+fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
+fixture: mount("sysfs", "/sys", "sysfs", 14, data)
+fixture: mount("proc", "/proc", "proc", 14, data)
+r=readfile("/nerves_initramfs.conf")
+print(r)
+
+fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
+fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
+fixture: umount("/sys")
+fixture: umount("/proc")
+fixture: unlinkat("bin", AT_REMOVEDIR)
+fixture: unlinkat("usr", AT_REMOVEDIR)
+fixture: rmdir("/sys")
+fixture: rmdir("/proc")
+fixture: mount(".", "/", "(null)", 8192, data)
+fixture: chroot(.)
+Hello from the chained /sbin/init
+EOF

@@ -669,6 +669,22 @@ static const struct term *function_sleep(const struct term *parameters)
     usleep(milliseconds * 1000);
     return NULL;
 }
+static const struct term *function_readfile(const struct term *parameters)
+{
+    const char *path = term_to_string(parameters)->string;
+
+    FILE *fp = fopen(path, "rb");
+    if (fp) {
+        char buffer[HEAP_SIZE / 4];
+        size_t len = fread(buffer, 1, sizeof(buffer) - 1, fp);
+        buffer[len] = 0;
+        fclose(fp);
+        return term_new_string(buffer);
+    } else {
+        info("Error reading %s", path);
+        return term_new_string("");
+    }
+}
 
 static const struct term *function_help(const struct term *parameters);
 
@@ -687,6 +703,7 @@ static struct function_info function_table[] = {
     {"ls", 0, function_ls, "list files"},
     {"poweroff", 0, function_poweroff, "power off the device"},
     {"print", 1, function_print, "print one or more strings and variables"},
+    {"readfile", 1, function_readfile, "read a file (truncates long files)"},
     {"reboot", 0, function_reboot, "reset the device"},
     {"saveenv", 0, function_saveenv, "save all U-Boot variables back to storage"},
     {"setenv", 2, function_setenv, "set a U-Boot variable. It is not saved until you call saveenv/0"},
