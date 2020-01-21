@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.2
+
+* New features
+  * Add a readfile() function
+
+* Bug fixes
+  * Fix static build of init
+
 ## v0.3.1
 
 * New features
