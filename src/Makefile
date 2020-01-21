@@ -21,10 +21,10 @@ OBJS += compat/compat.o
 endif
 
 init: $(OBJS)
-	$(CC) $(LDLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $(EXTRA_CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c -o $@ $^
 
 parser.tab.c parser.tab.h: parser.y
 	$(BISON) -d $(BISONFLAGS) $<
