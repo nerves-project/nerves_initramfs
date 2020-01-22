@@ -68,17 +68,18 @@ uboot_env.start    | The block offset of the U-Boot environment. (512 byte block
 uboot_env.count    | The number of blocks in the environment. Defaults to 256.
 run_repl           | True to run a REPL before booting. This is useful for debug. Defaults to `false`
 
-Variables can be overridden using the Linux commandline via the
-`--nerves_initramfs` option. For example, to override `run_repl`, pass:
+Variables can be overridden using the Linux commandline. See your platform's
+bootloader documentation for how to pass options to Linux. At the end of the
+commandline, add a `--` and then add `variable` and `variable=value` strings.
+The `--` will stop the Linux kernel from processing parameters so make sure that
+everything intended for Linux is on the left side and everything for
+`nerves_initramfs` is on the right side.
+
+For example, the following Linux commandline sets the Linux console and then
+passes a root filesystem path to `nerves_initgadget` and starts a repl.
 
 ```text
---nerves_initramfs=run_repl
-```
-
-To set a variable:
-
-```text
---nerves_initramfs=rootfs.path=/dev/abc123
+console=tty1 -- rootfs.path=/dev/sda2 run_repl
 ```
 
 ### Functions

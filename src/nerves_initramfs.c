@@ -248,16 +248,26 @@ static void initialize_script_defaults(int argc, char *argv[])
 
     set_boolean_variable("run_repl", false);
 
-    // Scan the commandline for more parameters to set
-    // Parameters are of the form:
+    // Scan the commandline for more parameters to set. Our instructions tell
+    // users to put options for us after a `--`. The `--` isn't passed in the
+    // argument list, so we can't search for that. However, Linux won't remove
+    // or process anything after the `--` and that is a big deal to avoid
+    // confusing clashes with Linux options.
     //
-    //   --nerves_initramfs=key
+    // Parameters have the form:
+    //
+    //   key
     // or
-    //   --nerves_initramfs=key=value
+    //   key=value
+    //
+    // In the first case, `key` is set to `true`. For the second
+    // case, the value is always interpreted as a string.
+    debug("argc=%d, argv[0]='%s'", argc, argv[0]);
     for (int i = 1; i < argc; i++) {
         debug("argv[%d]='%s'", i, argv[i]);
-        if (strncmp("--nerves_initramfs=", argv[i], 19) == 0) {
-            char *key = argv[i] + 19;
+
+        if (argv[i][0] != '-') {
+            char *key = argv[i];
             char *equals = strchr(key, '=');
 
             if (equals) {

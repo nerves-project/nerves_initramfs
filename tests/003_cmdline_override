@@ -1,11 +1,11 @@
 #!/bin/sh
 
 #
-# Test that no options does the expected
+# Test that specifying an option gets picked up
 #
 
 cat >$CMDLINE_FILE <<EOF
---nerves_initramfs=rootfs.fstype=myfstype
+--run_repl -another_thing_that_should_be_ignored rootfs.fstype=myfstype
 EOF
 
 cat >"$EXPECTED" <<EOF
