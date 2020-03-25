@@ -35,7 +35,7 @@ static int losetup(int rootfs_fd)
     return loop_fd;
 }
 
-static int dm_create(off_t rootfs_size, const char *cipher, const char *secret)
+static int dm_create(off_t rootfs_blocks, const char *cipher, const char *secret)
 {
     int dm_control = open("/dev/mapper/control", O_RDWR);
 
@@ -72,7 +72,7 @@ static int dm_create(off_t rootfs_size, const char *cipher, const char *secret)
     struct dm_target_spec *target = (struct dm_target_spec *) &request_buffer[dm->data_start];
     memset(target, 0, sizeof(struct dm_target_spec));
     target->sector_start = 0;
-    target->length = rootfs_size;
+    target->length = rootfs_blocks;
     strcpy(target->target_type, "crypt");
     sprintf((char *) &request_buffer[dm->data_start + sizeof(struct dm_target_spec)], "%s %s 0 /dev/loop0 0", cipher, secret);
     OK_OR_FATAL(ioctl(dm_control, DM_TABLE_LOAD, request_buffer), "Check CONFIG_DM_CRYPT and crypto algs enabled");
@@ -203,10 +203,16 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
     off_t rootfs_size = lseek(rootfs_fd, 0, SEEK_END);
     (void) lseek(rootfs_fd, 0, SEEK_SET);
 
+    size_t block_size;
+    if (ioctl(rootfs_fd, BLKSSZGET, &block_size) < 0)
+        block_size = 512;;
+
+    off_t rootfs_blocks = rootfs_size / block_size;
+
     int loop_fd = losetup(rootfs_fd);
     close(rootfs_fd);
 
-    dm_create(rootfs_size, cipher, secret);
+    dm_create(rootfs_blocks, cipher, secret);
 
     OK_OR_FATAL(mount("/dev/dm-0", "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
 

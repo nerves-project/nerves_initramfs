@@ -18,9 +18,10 @@ fixture: mkdir("/proc", 555)
 fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 fixture: mount("proc", "/proc", "proc", 14, data)
+fixture: ioctl(BLKSSZGET)
 fixture: ioctl(LOOP_SET_FD)
 fixture: ioctl(DM_DEV_CREATE, data_size=16384, data_start=312, target_count=0, open_count=0, flags=0, event_nr=0, dev=0x0, name=rootfs, uuid=CRYPT-PLAIN-rootfs
-fixture: ioctl(DM_TABLE_LOAD, data_size=16384, data_start=312, target_count=1, open_count=0, flags=32768, event_nr=0, dev=0x0, name=rootfs, uuid=, target=0,524288,crypt (aes-cbc-plain 8e9c0780fd7f5d00c18a30812fe960cfce71f6074dd9cded6aab2897568cc856 0 /dev/loop0 0)
+fixture: ioctl(DM_TABLE_LOAD, data_size=16384, data_start=312, target_count=1, open_count=0, flags=32768, event_nr=0, dev=0x0, name=rootfs, uuid=, target=0,1024,crypt (aes-cbc-plain 8e9c0780fd7f5d00c18a30812fe960cfce71f6074dd9cded6aab2897568cc856 0 /dev/loop0 0)
 fixture: ioctl(DM_DEV_SUSPEND, data_size=16384, data_start=312, target_count=0, open_count=0, flags=32768, event_nr=0, dev=0x0, name=rootfs, uuid=
 fixture: mount("/dev/dm-0", "/mnt", "squashfs", 1, data)
 fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)

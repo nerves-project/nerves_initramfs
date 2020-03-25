@@ -530,6 +530,19 @@ OVERRIDE(int, ioctl, (int fd, unsigned long request, ...))
         req = "LOOP_SET_FD";
         break;
 
+    case BLKSSZGET:
+    {
+        va_list ap;
+        va_start(ap, request);
+        size_t *block_size = va_arg(ap, size_t *);
+
+        *block_size = 512;
+
+        va_end(ap);
+        req = "BLKSSZGET";
+        break;
+    }
+
     default:
         log("unknown ioctl(0x%08lx)", request);
         req = "unknown";
