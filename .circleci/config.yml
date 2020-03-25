@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: nervesproject/nerves_system_br:1.10.0
+    - image: nervesproject/nerves_system_br:1.11.0
 
 install_ghr: &install_ghr
   run:
