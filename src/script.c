@@ -628,7 +628,9 @@ static const struct term *function_fwup_revert(const struct term *parameters)
         return term_new_boolean(false);
     }
 
-    return term_new_boolean(true);
+
+    reboot(LINUX_REBOOT_CMD_RESTART);
+    exit(EXIT_FAILURE);
 }
 static const struct term *function_ls(const struct term *parameters)
 {

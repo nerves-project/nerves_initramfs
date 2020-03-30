@@ -17,16 +17,6 @@ fixture: mount("devtmpfs", "/dev", "devtmpfs", 10, data)
 fixture: mount("sysfs", "/sys", "sysfs", 14, data)
 fixture: mount("proc", "/proc", "proc", 14, data)
 Hello from fwup: revert.fw -d /dev/mmcblk0 -t revert
-fixture: mount("/dev/mmcblk0p2", "/mnt", "squashfs", 1, data)
-fixture: mount("/dev", "/mnt/dev", "(null)", 8192, data)
-fixture: umount("/sys")
-fixture: umount("/proc")
-fixture: unlinkat("bin", AT_REMOVEDIR)
-fixture: unlinkat("usr", AT_REMOVEDIR)
-fixture: rmdir("/sys")
-fixture: rmdir("/proc")
-fixture: mount(".", "/", "(null)", 8192, data)
-fixture: chroot(.)
-Hello from the chained /sbin/init
+fixture: reboot(0x01234567)
 EOF
 

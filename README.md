@@ -91,7 +91,7 @@ Function           | Description
 blkid()            | Print out information about all block devices
 cmd()              | Run an external program. The first argument is the path to the program, the next is the first argument, and so on.
 env()              | Print out all loaded U-Boot variables
-fwup_revert()      | Run fwup with the appropriate parameters to revert to the previous firmware.
+fwup_revert()      | Run fwup with the appropriate parameters to revert to the previous firmware. Reboots on success.
 getenv(key)        | Get the value of a U-Boot variable
 help()             | Print out help when running in the REPL
 print(...)         | Print one or more strings and variables
