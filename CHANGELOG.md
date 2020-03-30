@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.3.3
+
+* New features
+  * Change Linux command line override format to actually work. New format is
+    to pass `--` and then `key` or `key=value` parameters. For example,
+    `-- rootfs.path=/dev/sda2 run_repl`
+  * Create /dev/rootdisk symlinks - These are used various places to generically
+    refer to the boot block device. Creating them here is more reliable than
+    other locations since the symlinks are based on the nerves_initramfs
+    configuration rather than trying to derive them from mount information.
+  * Buildroot 2020.02
+  * fwup v1.5.2 - footprint reductions
+
+* Bug fixes
+  * Fix block calculation for call to device mapper
+
 ## v0.3.2
 
 * New features
