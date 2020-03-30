@@ -614,8 +614,8 @@ static const struct term *function_fwup_revert(const struct term *parameters)
 
     const char *devpathspec = get_variable_as_string("uboot_env.path");
     char devpath[BLOCK_DEVICE_PATH_LEN];
-    if (find_block_device_by_spec(devpathspec, devpath) < 0) {
-        info("");
+    if (resolve_block_device_spec(devpathspec, devpath) < 0) {
+        info("Failure to revert due to invalid uboot_env.path");
         return term_new_boolean(false);
     }
 

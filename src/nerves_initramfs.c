@@ -19,6 +19,7 @@
 #include "linenoise.h"
 #include "script.h"
 #include "block_device.h"
+#include "rootdisk.h"
 
 // Global U-Boot environment data
 struct uboot_env working_uboot_env;
@@ -181,25 +182,23 @@ static void setup_initramfs()
     OK_OR_WARN(mount("proc", "/proc", "proc", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL), "Can't mount /proc");
 }
 
-static void mount_fs(const char *rootfs, const char *rootfs_type)
+static void mount_fs(const char *rootfs_path, const char *rootfs_type)
 {
     // Wait for the rootfs to appear
-    char rootfs_path[BLOCK_DEVICE_PATH_LEN];
-    int rootfs_fd = open_block_device(rootfs, O_RDONLY, rootfs_path);
+    int rootfs_fd = open(rootfs_path, O_RDONLY);
     if (rootfs_fd < 0)
-        fatal("Can't continue since '%s' does not exist.", rootfs);
+        fatal("Can't continue since '%s' does not exist.", rootfs_path);
     close(rootfs_fd);
 
-    OK_OR_FATAL(mount(rootfs_path, "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
+    OK_OR_FATAL(mount(rootfs_path, "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s", rootfs_type, rootfs_path);
 }
 
-static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, const char *cipher, const char *secret)
+static void mount_encrypted_fs(const char *rootfs_path, const char *rootfs_type, const char *cipher, const char *secret)
 {
     // Wait for the rootfs to appear
-    char rootfs_path[BLOCK_DEVICE_PATH_LEN];
-    int rootfs_fd = open_block_device(rootfs, O_RDONLY, rootfs_path);
+    int rootfs_fd = open(rootfs_path, O_RDONLY);
     if (rootfs_fd < 0)
-        fatal("Can't continue since '%s' does not exist.", rootfs);
+        fatal("Can't continue since '%s' does not exist.", rootfs_path);
     off_t rootfs_size = lseek(rootfs_fd, 0, SEEK_END);
     (void) lseek(rootfs_fd, 0, SEEK_SET);
 
@@ -214,7 +213,7 @@ static void mount_encrypted_fs(const char *rootfs, const char *rootfs_type, cons
 
     dm_create(rootfs_blocks, cipher, secret);
 
-    OK_OR_FATAL(mount("/dev/dm-0", "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s(%s)", rootfs_type, rootfs, rootfs_path);
+    OK_OR_FATAL(mount("/dev/dm-0", "/mnt", rootfs_type, MS_RDONLY, NULL), "Expecting %s filesystem on %s", rootfs_type, rootfs_path);
 
     // It's ok to close loop_fd now that the mount happened.
     close(loop_fd);
@@ -308,16 +307,25 @@ int main(int argc, char *argv[])
     if (get_variable_as_boolean("run_repl"))
         repl();
 
-    const char *rootfs_path = get_variable_as_string("rootfs.path");
+    // Mount the root filesystem
+    const char *rootfs_spec = get_variable_as_string("rootfs.path");
+    char resolved_rootfs_path[BLOCK_DEVICE_PATH_LEN];
+    if (resolve_block_device_spec(rootfs_spec, resolved_rootfs_path) < 0)
+        fatal("Can't continue since '%s' does not exist.", rootfs_spec);
+
     const char *rootfs_fstype = get_variable_as_string("rootfs.fstype");
     if (get_variable_as_boolean("rootfs.encrypted"))
-        mount_encrypted_fs(rootfs_path,
+        mount_encrypted_fs(resolved_rootfs_path,
                            rootfs_fstype,
                            get_variable_as_string("rootfs.cipher"),
                            get_variable_as_string("rootfs.secret"));
     else
-        mount_fs(rootfs_path, rootfs_fstype);
+        mount_fs(resolved_rootfs_path, rootfs_fstype);
 
+    // Finalize our setup of the root filesystem
+    create_rootdisk_symlinks(resolved_rootfs_path);
+
+    // Switch over to the new root filesystem
     switch_root();
 
     // Launch the real init. It's always /sbin/init with Buildroot.

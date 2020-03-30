@@ -304,6 +304,8 @@ OVERRIDE(int, dup2, (int oldfd, int newfd))
 
 OVERRIDE(int, symlink, (const char *target, const char *linkpath))
 {
+    log("symlink(\"%s\",\"%s\")", target, linkpath);
+
     char new_target[PATH_MAX];
     if (fixup_path(target, new_target) < 0)
         return -1;
@@ -354,29 +356,32 @@ OVERRIDE(int, unlinkat, (int fd, const char *path, int flag))
 OVERRIDE(int, stat, (const char *pathname, struct stat *st))
 {
     memset(st, 0, sizeof(struct stat));
-    if (strcmp(pathname, "/") == 0) {
-        // init stat's "/" to figure out the root device
-        st->st_dev = 0x81;
-        st->st_mode = S_IFDIR;
-        return 0;
-    } else if (strcmp(pathname, "/dev/mmcblk0p0") == 0) {
-        st->st_rdev = 0x80;
+    if (strcmp(pathname, "/dev/mmcblk0p0") == 0) {
+        st->st_rdev = 0xb300;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p1") == 0) {
-        st->st_rdev = 0x81;
+        st->st_rdev = 0xb301;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p2") == 0) {
-        st->st_rdev = 0x82;
+        st->st_rdev = 0xb302;
         st->st_mode = S_IFBLK;
         return 0;
-    } else if (strcmp(pathname, "/dev/mmcblk0p3") == 0) {
-        st->st_rdev = 0x83;
+    } else if (strcmp(pathname, "/dev/mmcblk0p5") == 0) {
+        st->st_rdev = 0xb305;
         st->st_mode = S_IFBLK;
         return 0;
-    } else if (strcmp(pathname, "/dev/mmcblk0p4") == 0) {
-        st->st_rdev = 0x84;
+    } else if (strcmp(pathname, "/dev/sda") == 0) {
+        st->st_rdev = 0x800;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/sda1") == 0) {
+        st->st_rdev = 0x801;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/sda2") == 0) {
+        st->st_rdev = 0x802;
         st->st_mode = S_IFBLK;
         return 0;
     } else {
@@ -390,29 +395,40 @@ OVERRIDE(int, stat, (const char *pathname, struct stat *st))
 OVERRIDE(int, __xstat, (int ver, const char *pathname, struct stat *st))
 {
     memset(st, 0, sizeof(struct stat));
-    if (strcmp(pathname, "/") == 0) {
-        // init stat's "/" to figure out the root device
-        st->st_dev = 0x81;
-        st->st_mode = S_IFDIR;
-        return 0;
-    } else if (strcmp(pathname, "/dev/mmcblk0p0") == 0) {
-        st->st_rdev = 0x80;
+    if (strcmp(pathname, "/dev/mmcblk0p0") == 0) {
+        st->st_rdev = 0xb300;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p1") == 0) {
-        st->st_rdev = 0x81;
+        st->st_rdev = 0xb301;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p2") == 0) {
-        st->st_rdev = 0x82;
+        st->st_rdev = 0xb302;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p3") == 0) {
-        st->st_rdev = 0x83;
+        st->st_rdev = 0xb303;
         st->st_mode = S_IFBLK;
         return 0;
     } else if (strcmp(pathname, "/dev/mmcblk0p4") == 0) {
-        st->st_rdev = 0x84;
+        st->st_rdev = 0xb304;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/mmcblk0p5") == 0) {
+        st->st_rdev = 0xb305;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/sda") == 0) {
+        st->st_rdev = 0x800;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/sda1") == 0) {
+        st->st_rdev = 0x801;
+        st->st_mode = S_IFBLK;
+        return 0;
+    } else if (strcmp(pathname, "/dev/sda2") == 0) {
+        st->st_rdev = 0x802;
         st->st_mode = S_IFBLK;
         return 0;
     } else {

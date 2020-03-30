@@ -13,7 +13,7 @@ endif
 
 CFLAGS += -DPROGRAM_VERSION=$(VERSION)
 
-OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o block_device.o cmd.o
+OBJS = nerves_initramfs.o util.o crc32.o uboot_env.o lex.yy.o parser.tab.o script.o linenoise.o block_device.o cmd.o rootdisk.o
 
 ifeq ($(shell uname),Darwin)
 EXTRA_CFLAGS += -Icompat

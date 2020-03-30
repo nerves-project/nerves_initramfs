@@ -249,7 +249,7 @@ static int find_block_device_by_uuid(enum block_device_type type, const char *uu
     return rc;
 }
 
-int find_block_device_by_spec(const char *spec, char *path)
+static int find_block_device_by_spec(const char *spec, char *path)
 {
     if (strncmp("PARTUUID=", spec, 9) == 0) {
         return find_block_device_by_uuid(BLOCK_DEVICE_PARTITION, &spec[9], path);
@@ -288,4 +288,15 @@ int open_block_device(const char *spec, int flags, char *path)
         info("Could not open block device '%s' even after waiting!", spec);
 
     return fd;
+}
+
+int resolve_block_device_spec(const char *spec, char *path)
+{
+    int fd = open_block_device(spec, O_RDONLY, path);
+    if (fd >= 0) {
+        close(fd);
+        return 0;
+    } else {
+        return -1;
+    }
 }

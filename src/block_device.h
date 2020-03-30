@@ -18,7 +18,7 @@ struct block_device_info
 
 int probe_block_devices(struct block_device_info **devices);
 void free_block_devices(struct block_device_info *devices);
-int find_block_device_by_spec(const char *spec, char *path);
+int resolve_block_device_spec(const char *spec, char *path);
 int open_block_device(const char *spec, int flags, char *path);
 
 #endif
