@@ -76,7 +76,7 @@ everything intended for Linux is on the left side and everything for
 `nerves_initramfs` is on the right side.
 
 For example, the following Linux commandline sets the Linux console and then
-passes a root filesystem path to `nerves_initgadget` and starts a repl.
+passes a root filesystem path to `nerves_initramfs` and starts a repl.
 
 ```text
 console=tty1 -- rootfs.path=/dev/sda2 run_repl
