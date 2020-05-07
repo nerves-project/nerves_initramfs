@@ -21,6 +21,7 @@ build_initramfs: &build_initramfs
         command: |
           mkdir -p ~/deploy/artifacts
           cp CHANGELOG.md ~/deploy/CHANGELOG.md
+          cp file-to-cpio.sh ~/deploy/artifacts
     - run:
         name: Build initramfs images
         command: |
@@ -119,6 +120,7 @@ jobs:
           command: |
             mkdir -p ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
             mv ~/deploy/artifacts/nerves_initramfs_* ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
+            mv ~/deploy/artifacts/file-to-cpio.sh ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
             cd ~/deploy/artifacts && tar cfz nerves_initramfs-$CIRCLE_TAG.tar.gz nerves_initramfs-$CIRCLE_TAG
             cd ~/deploy/artifacts && sha256sum nerves_initramfs-$CIRCLE_TAG.tar.gz > nerves_initramfs-$CIRCLE_TAG.tar.gz.sha256
             rm -fr ~/deploy/artifacts/nerves_initramfs-$CIRCLE_TAG
