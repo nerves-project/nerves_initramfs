@@ -134,7 +134,7 @@ cd o/arm
 make
 ```
 
-The `initramfs` images will be in the `images` directory. You can also run `make
+The `nerves_initramfs` images will be in the `images` directory. You can also run `make
 menuconfig` to enable other applications and libraries that may be useful for
 your particular setup.
 
