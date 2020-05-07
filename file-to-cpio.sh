@@ -1,11 +1,11 @@
 #!/bin/sh
 
 #
-# config-to-cpio.sh <nerves_initramfs.conf> <output.cpio[.gz|.xz]>
+# file-to-cpio.sh <file.ext> <output.cpio[.gz|.xz]>
 #
-# This script packages the specified nerves_initramfs.conf file into an
-# optionally-compressed cpio file that can be concatenated to
-# nerves_initramfs.cpio.* to configure the initramfs.
+# This script packages the specified file into an optionally-compressed 
+# cpio file that can be concatenated to other *.cpio.* files for
+# configuring the initramfs.
 #
 # If you need to supply more files to the initramfs, just concatenate another
 # cpio (compressed or not) onto this one. The Linux kernel's cpio extractor
@@ -16,7 +16,7 @@ INPUT=$1
 OUTPUT=$2
 
 if [ -z $INPUT ]; then
-    echo "Please pass in a path to a configuration file"
+    echo "Please pass in a path to a file"
     exit 1
 fi
 
@@ -36,11 +36,14 @@ case "$OUTPUT" in
     *) COMPRESS=cat;;
 esac
 
+FILENAME=$(basename $INPUT)
 WORKDIR=$(mktemp -d)
-cp $INPUT $WORKDIR/nerves_initramfs.conf
-(cd $WORKDIR; echo nerves_initramfs.conf | cpio -o -H newC --owner=root:root --reproducible --quiet | $COMPRESS > "$ABSOLUTE_OUTPUT")
-rm $WORKDIR/nerves_initramfs.conf
+
+echo "CPIO File: $FILENAME"
+
+cp $INPUT $WORKDIR/$FILENAME
+(cd $WORKDIR; echo $FILENAME | cpio -o -H newC --owner=root:root --reproducible --quiet | $COMPRESS > "$ABSOLUTE_OUTPUT")
+rm $WORKDIR/$FILENAME
 rmdir $WORKDIR
 
 exit 0
-

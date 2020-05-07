@@ -160,17 +160,41 @@ To mount encrypted filesystems, you'll need these additional configuration strin
 * `CONFIG_CRYPTO_AES=y` - Make sure to enable the cryptographic algorithms that
   you're using. Hardware acceleration options may exist as well.
 
+## Preparing files for boot
+
+`initramfs` requires a single file in `cpio` format. If you have multiple files, they
+need to be converted to `cpio` format and concatenated together with the build.
+
+The compressed build files are already in cpio format, but you will need to convert
+your `nerves_initramfs.confg` and any other files (such as `revert.fw`) then
+concatenate them together before using on boot. The helper script `file-to-cpio.sh`
+was created for this and is included with the release so it can be used as needed.
+
+Your implementation may differ, but a simple usage example is:
+
+```sh
+$ file-to-cpio.sh nerves_initramfs.conf nerves_initramfs.conf.cpio
+$ file-to-cpio.sh revert.fw revert.fw.cpio
+
+# Then concatenate files together
+# The build .gz/.xz is already cpio format
+$ cat nerves_initramfs_arm.gz nerves_initramfs.conf.cpio revert.fw.cpio > nerves_initramfs
+$ cp nerves_initramfs /path/to/your/boot/partition
+```
+
 ## Raspberry Pi configuration
 
-The Raspberry Pi's bootloader supports loading `initramfs` images off the DOS
-partition that contains the Linux kernel. Copy the ARM-architecture release to
-the DOS partition (in Nerves, you can do this manually or edit the `fwup.conf`
-to automate). Since gzip compression is pretty much always enabled in Linux
-kernels, the `initramfs.gz` is safe to use. Add the following line to
-`config.txt`:
+The Raspberry Pi's bootloader supports loading `initramfs` images off the boot
+partition that contains the Linux kernel. Since gzip compression is pretty much
+always enabled in Linux kernels, the `nerves_initramfs_arm.gz` is safe to use.
+
+First, follow the steps in [**Preparing files for boot**](#preparing-files-for-boot),
+copy the `nerves_initramfs` file to the boot partition (in Nerves, you can do this
+manually or edit the `fwup.conf` to automate prepping and copying the files),
+then add this line to `config.txt`:
 
 ```config
-initramfs initramfs.gz followkernel
+initramfs nerves_initramfs followkernel
 ```
 
 See the [official config.txt boot
