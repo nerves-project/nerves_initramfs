@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.0
+
+* New features
+  * Add `file-to-cpio.sh` helper script to release so that systems using
+    `nerves_initramfs` don't need to maintain a copy.
+  * fwup v1.7.0
+
 ## v0.3.3
 
 * New features
