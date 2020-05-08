@@ -1,6 +1,6 @@
 # nerves_initramfs
 
-[![CircleCI](https://circleci.com/gh/fhunleth/nerves_initramfs.svg?style=svg)](https://circleci.com/gh/fhunleth/nerves_initramfs)
+[![CircleCI](https://circleci.com/gh/nerves-project/nerves_initramfs.svg?style=svg)](https://circleci.com/gh/nerves-project/nerves_initramfs)
 
 This project creates a tiny
 [initramfs](https://en.wikipedia.org/wiki/Initial_ramdisk) that supports

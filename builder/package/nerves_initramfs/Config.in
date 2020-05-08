@@ -4,7 +4,7 @@ config BR2_PACKAGE_NERVES_INITRAMFS
 	help
 	  An initramfs project for Nerves.
 
-	  https://github.com/fhunleth/nerves_initramfs
+	  https://github.com/nerves-project/nerves_initramfs
 
 if BR2_PACKAGE_NERVES_INITRAMFS
 
