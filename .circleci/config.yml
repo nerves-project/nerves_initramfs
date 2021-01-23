@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: nervesproject/nerves_system_br:1.11.0
+    - image: nervesproject/nerves_system_br:1.14.2
 
 install_ghr: &install_ghr
   run:
@@ -61,6 +61,12 @@ jobs:
         TARGET_CONFIG: nerves_initramfs_arm
     <<: *build_initramfs
 
+  build_aarch64:
+    <<: *defaults
+    environment:
+        TARGET_CONFIG: nerves_initramfs_aarch64
+    <<: *build_initramfs
+
   build_x86_64:
     <<: *defaults
     environment:
@@ -71,6 +77,12 @@ jobs:
     <<: *defaults
     environment:
         TARGET_CONFIG: nerves_initramfs_debug_arm
+    <<: *build_initramfs
+
+  build_debug_arm:
+    <<: *defaults
+    environment:
+        TARGET_CONFIG: nerves_initramfs_debug_aarch64
     <<: *build_initramfs
 
   build_debug_x86_64:
@@ -98,6 +110,11 @@ jobs:
       - restore_cache:
           key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
       - run:
+          name: Restore nerves_initramfs_aarch64
+          command: echo "nerves_initramfs_aarch64" > .target
+      - restore_cache:
+          key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
+      - run:
           name: Restore nerves_initramfs_x86_64
           command: echo "nerves_initramfs_x86_64" > .target
       - restore_cache:
@@ -105,6 +122,11 @@ jobs:
       - run:
           name: Restore nerves_initramfs_debug_arm
           command: echo "nerves_initramfs_debug_arm" > .target
+      - restore_cache:
+          key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
+      - run:
+          name: Restore nerves_initramfs_debug_aarch64
+          command: echo "nerves_initramfs_debug_aarch64" > .target
       - restore_cache:
           key: deploy/{{ checksum ".target" }}-{{ .Revision }}-{{ .Environment.CIRCLE_TAG }}
       - run:
@@ -140,11 +162,19 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - build_aarch64:
+          filters:
+            tags:
+              only: /.*/
       - build_x86_64:
           filters:
             tags:
               only: /.*/
       - build_debug_arm:
+          filters:
+            tags:
+              only: /.*/
+      - build_debug_aarch64:
           filters:
             tags:
               only: /.*/
@@ -159,8 +189,10 @@ workflows:
       - deploy:
           requires:
             - build_debug_arm
+            - build_debug_aaarch64
             - build_debug_x86_64
             - build_arm
+            - build_aarch64
             - build_x86_64
             - test
           filters:
