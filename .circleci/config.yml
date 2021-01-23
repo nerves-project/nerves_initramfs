@@ -79,7 +79,7 @@ jobs:
         TARGET_CONFIG: nerves_initramfs_debug_arm
     <<: *build_initramfs
 
-  build_debug_arm:
+  build_debug_aarch64:
     <<: *defaults
     environment:
         TARGET_CONFIG: nerves_initramfs_debug_aarch64
@@ -189,7 +189,7 @@ workflows:
       - deploy:
           requires:
             - build_debug_arm
-            - build_debug_aaarch64
+            - build_debug_aarch64
             - build_debug_x86_64
             - build_arm
             - build_aarch64
