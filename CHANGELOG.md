@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.0
+
+* New features
+  * Added nerves_initramfs support for `aarch64` targets.
+  * buildroot 2020.11.1
+  * fwup v1.8.3
+
 ## v0.4.0
 
 * New features
