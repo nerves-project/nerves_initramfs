@@ -13,7 +13,7 @@ else
 fi
 
 mkdir -p "$BINARIES_DIR"
-cd "$TARGET_DIR" && echo $FILES | cpio -o -H newC --owner=root:root --reproducible --quiet > "$BINARIES_DIR/rootfs.cpio"
+cd "$TARGET_DIR" && printf $FILES | cpio -o -H newC --owner=root:root --reproducible --quiet > "$BINARIES_DIR/rootfs.cpio"
 
 # Notes on compressor options:
 #
