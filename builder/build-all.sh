@@ -22,7 +22,7 @@ for config in $configs; do
     echo "Building $base..."
 
     # If rebuilding, force a rebuild of nerves_initramfs.
-    rm -fr o/$base/build/nerves_initramfs
+    rm -fr "o/$base/build/nerves_initramfs"
 
     make -C o/$base
     if [[ $? != 0 ]]; then
