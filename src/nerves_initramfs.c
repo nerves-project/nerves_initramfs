@@ -213,7 +213,7 @@ static void mount_encrypted_fs(const char *rootfs_path, const char *rootfs_type,
     off_t rootfs_size = lseek(rootfs_fd, 0, SEEK_END);
     (void) lseek(rootfs_fd, 0, SEEK_SET);
 
-    size_t block_size;
+    int block_size;
     if (ioctl(rootfs_fd, BLKSSZGET, &block_size) < 0)
         block_size = 512;;
 
