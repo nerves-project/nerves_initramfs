@@ -39,6 +39,8 @@ static int losetup(int rootfs_fd)
 static int dm_create(off_t rootfs_blocks, const char *cipher, const char *secret)
 {
     int dm_control = open("/dev/mapper/control", O_RDWR);
+    if (dm_control < 0)
+        fatal("Can't continue since '/dev/mapper/control' does not exist.");
 
     uint8_t request_buffer[16384];
     struct dm_ioctl *dm = (struct dm_ioctl *) request_buffer;
@@ -78,7 +80,6 @@ static int dm_create(off_t rootfs_blocks, const char *cipher, const char *secret
     sprintf((char *) &request_buffer[dm->data_start + sizeof(struct dm_target_spec)], "%s %s 0 /dev/loop0 0", cipher, secret);
     OK_OR_FATAL(ioctl(dm_control, DM_TABLE_LOAD, request_buffer), "Check CONFIG_DM_CRYPT and crypto algs enabled");
 
-
     memset(&request_buffer, 0, sizeof(request_buffer));
     dm->version[0] = DM_VERSION_MAJOR;
     dm->version[1] = DM_VERSION_MINOR;
@@ -111,6 +112,11 @@ static bool in_skip_list(const char *what, const char **list)
 void cleanup_dir(int dirfd, const char **skip_list)
 {
     DIR *dir = fdopendir(dirfd);
+    if (dir == NULL) {
+        info("fdopendir failed");
+        return;
+    }
+
     for (struct dirent *dt = readdir(dir); dt != NULL; dt = readdir(dir)) {
         // Skip . and ..
         const char *name = dt->d_name;
@@ -136,6 +142,11 @@ void cleanup_dir(int dirfd, const char **skip_list)
 static void cleanup_old_rootfs()
 {
     int fd = open("/", O_RDONLY);
+    if (fd < 0) {
+        info("Can't open '/'?");
+        return;
+    }
+
     cleanup_dir(fd, root_skip_list);
 
     rmdir("/sys");
